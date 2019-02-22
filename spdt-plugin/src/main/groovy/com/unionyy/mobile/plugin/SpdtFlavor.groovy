@@ -2,7 +2,7 @@ package com.unionyy.mobile.plugin
 
 import com.google.gson.annotations.SerializedName
 
-class SpdtFlavorContainer {
+class SpdtFlavor {
 
     @SerializedName("flavorName")
     String flavorName = "YYFlavor"

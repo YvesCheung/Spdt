@@ -4,8 +4,12 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.google.gson.Gson
 import org.gradle.api.GradleException
+import org.gradle.api.Namer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.reflect.ObjectInstantiationException
+import org.gradle.internal.reflect.DirectInstantiator
+import org.gradle.internal.reflect.Instantiator
 
 /**
  * Created by 张宇 on 2019/2/21.
@@ -14,17 +18,27 @@ import org.gradle.api.Project
  */
 class SpdtPlugin implements Plugin<Project> {
 
+    private def initializer = DirectInstantiator.INSTANCE
+
+    private Namer<SpdtFlavor> namer = new Namer<SpdtFlavor>() {
+        @Override
+        String determineName(SpdtFlavor spdtFlavor) {
+            return spdtFlavor.flavorName
+        }
+    }
+
     @Override
     void apply(Project project) {
         println("Spdt apply ${project.name}")
 
-        def config = project.extensions.create("spdt", SpdtConfig)
+        def config = project.extensions.create(SpdtConfigContainer, "spdt", DefaultSpdtConfigContainer,
+                initializer, namer)
 
         def file = project.file("spdt.tmp")
         processAptParam(project, file)
 
         project.afterEvaluate {
-            if (!config.flavors.isEmpty()) {
+            if (!config.isEmpty()) {
                 checkConfig(config)
                 writeConfigToFile(config, file)
             }
@@ -32,32 +46,38 @@ class SpdtPlugin implements Plugin<Project> {
 
     }
 
-    private static writeConfigToFile(SpdtConfig config, File file) {
+    private static writeConfigToFile(SpdtConfigContainer config, File file) {
         println "================================================================="
         println "Spdt plugin startup!"
-        println "config is " + config.flavors
+        println "config is " + config
         println "================================================================="
 
-        file.write(new Gson().toJson(config.flavors))
+        file.write(new Gson().toJson(config))
     }
 
-    private static void checkConfig(SpdtConfig config) {
+    private static void checkConfig(SpdtConfigContainer configs) {
 
-        def reportError = {
-            throw new GradleException("The flavor name '$it' in 'spdt' config is not a valid Java identifier.")
+        if (configs.current == null) {
+            throw new GradleException("Missing property of 'current' in 'spdt' config. " +
+                    "Please specify the current flavor in [${configs.join(',')}]")
         }
 
-        config.flavors.each { flavor ->
+        def reportJavaIdentifierError = {
+            throw new GradleException("The flavor name '$it' in 'spdt' config is not a " +
+                    "valid Java identifier.")
+        }
+
+        configs.each { SpdtFlavor flavor ->
             def name = flavor.flavorName
             for (int i : 0..name.size() - 1) {
-                def entry = name.charAt(i)
+                char entry = name.charAt(i)
                 if (i == 0) {
                     if (!Character.isJavaIdentifierStart(entry)) {
-                        reportError(name)
+                        reportJavaIdentifierError(name)
                     }
                 } else {
                     if (!Character.isJavaIdentifierPart(entry)) {
-                        reportError(name)
+                        reportJavaIdentifierError(name)
                     }
                 }
             }
