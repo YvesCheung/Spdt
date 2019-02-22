@@ -1,0 +1,1 @@
+include ':app', ':spdt-plugin', ':spdt-api', ':spdt-annotation', ':spdt-compiler'
