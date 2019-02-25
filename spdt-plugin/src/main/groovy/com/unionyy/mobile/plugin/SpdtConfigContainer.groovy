@@ -1,10 +1,11 @@
 package com.unionyy.mobile.plugin
 
+import com.unionyy.mobile.spdt.data.SpdtFlavorData
 import org.gradle.api.NamedDomainObjectContainer
 
-interface SpdtConfigContainer extends NamedDomainObjectContainer<SpdtFlavor> {
+interface SpdtConfigContainer extends NamedDomainObjectContainer<SpdtFlavorData> {
 
-    void current(SpdtFlavor currentFlavor)
+    void setCurrent(SpdtFlavorData currentFlavor)
 
-    SpdtFlavor getCurrent()
+    SpdtFlavorData getCurrent()
 }

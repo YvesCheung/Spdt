@@ -3,13 +3,13 @@ package com.unionyy.mobile.plugin
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.google.gson.Gson
+import com.unionyy.mobile.spdt.data.SpdtConfigData
+import com.unionyy.mobile.spdt.data.SpdtFlavorData
 import org.gradle.api.GradleException
 import org.gradle.api.Namer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.reflect.ObjectInstantiationException
 import org.gradle.internal.reflect.DirectInstantiator
-import org.gradle.internal.reflect.Instantiator
 
 /**
  * Created by 张宇 on 2019/2/21.
@@ -20,9 +20,9 @@ class SpdtPlugin implements Plugin<Project> {
 
     private def initializer = DirectInstantiator.INSTANCE
 
-    private Namer<SpdtFlavor> namer = new Namer<SpdtFlavor>() {
+    private Namer<SpdtFlavorData> namer = new Namer<SpdtFlavorData>() {
         @Override
-        String determineName(SpdtFlavor spdtFlavor) {
+        String determineName(SpdtFlavorData spdtFlavor) {
             return spdtFlavor.flavorName
         }
     }
@@ -52,7 +52,8 @@ class SpdtPlugin implements Plugin<Project> {
         println "config is " + config
         println "================================================================="
 
-        file.write(new Gson().toJson(config))
+        def serializeConfig = new SpdtConfigData(config.toList(), config.current.flavorName)
+        file.write(new Gson().toJson(serializeConfig))
     }
 
     private static void checkConfig(SpdtConfigContainer configs) {
@@ -67,7 +68,7 @@ class SpdtPlugin implements Plugin<Project> {
                     "valid Java identifier.")
         }
 
-        configs.each { SpdtFlavor flavor ->
+        configs.each { SpdtFlavorData flavor ->
             def name = flavor.flavorName
             for (int i : 0..name.size() - 1) {
                 char entry = name.charAt(i)

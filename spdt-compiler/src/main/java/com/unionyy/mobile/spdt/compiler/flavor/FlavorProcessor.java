@@ -1,7 +1,6 @@
 package com.unionyy.mobile.spdt.compiler.flavor;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -11,6 +10,8 @@ import com.unionyy.mobile.spdt.annotation.SpdtActual;
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor;
 import com.unionyy.mobile.spdt.compiler.Env;
 import com.unionyy.mobile.spdt.compiler.IProcessor;
+import com.unionyy.mobile.spdt.data.SpdtConfigData;
+import com.unionyy.mobile.spdt.data.SpdtFlavorData;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,11 +54,9 @@ public class FlavorProcessor implements IProcessor {
     private void processFlavorClass(Env env, String configContent) {
         env.messager.printMessage(Diagnostic.Kind.NOTE, "flavorConfig = " + configContent);
 
-        List<Flavor> flavors = new Gson().fromJson(configContent,
-                new TypeToken<List<Flavor>>() {
-                }.getType());
+        SpdtConfigData config = new Gson().fromJson(configContent, SpdtConfigData.class);
 
-        for (Flavor flavor : flavors) {
+        for (SpdtFlavorData flavor : config.getFlavors()) {
 
             MethodSpec constructor = MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PROTECTED)
@@ -68,14 +67,14 @@ public class FlavorProcessor implements IProcessor {
                     .addAnnotation(NotNull.class)
                     .addAnnotation(Override.class)
                     .returns(String.class)
-                    .addCode("return $S;", flavor.appid)
+                    .addCode("return $S;", flavor.getAppid())
                     .build();
 
             AnnotationSpec spdtActual = AnnotationSpec.builder(SpdtActual.class)
-                    .addMember("value", "$T.class", ClassName.get(env.packageName, flavor.flavorName))
+                    .addMember("value", "$T.class", ClassName.get(env.packageName, flavor.getFlavorName()))
                     .build();
 
-            TypeSpec flavorCls = TypeSpec.classBuilder(flavor.flavorName)
+            TypeSpec flavorCls = TypeSpec.classBuilder(flavor.getFlavorName())
                     .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
                     .addMethod(constructor)
                     .addMethod(appid)

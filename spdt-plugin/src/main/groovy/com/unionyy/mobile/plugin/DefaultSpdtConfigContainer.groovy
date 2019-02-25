@@ -1,5 +1,6 @@
 package com.unionyy.mobile.plugin
 
+import com.unionyy.mobile.spdt.data.SpdtFlavorData
 import org.gradle.api.Namer
 import org.gradle.api.internal.AbstractNamedDomainObjectContainer
 import org.gradle.internal.reflect.Instantiator
@@ -9,27 +10,18 @@ import org.gradle.internal.reflect.Instantiator
  * E-mail: zhangyu4@yy.com
  * YY: 909017428
  */
-class DefaultSpdtConfigContainer extends AbstractNamedDomainObjectContainer<SpdtFlavor>
+class DefaultSpdtConfigContainer extends AbstractNamedDomainObjectContainer<SpdtFlavorData>
         implements SpdtConfigContainer {
 
-    DefaultSpdtConfigContainer(Instantiator instantiator, Namer<SpdtFlavor> namer) {
-        super(SpdtFlavor, instantiator, namer)
+    DefaultSpdtConfigContainer(Instantiator instantiator, Namer<SpdtFlavorData> namer) {
+        super(SpdtFlavorData, instantiator, namer)
     }
 
     @Override
-    protected SpdtFlavor doCreate(String s) {
-        new SpdtFlavor(flavorName: s)
+    protected SpdtFlavorData doCreate(String s) {
+        new SpdtFlavorData(flavorName: s)
     }
 
-    SpdtFlavor current
-
-    @Override
-    void current(SpdtFlavor currentFlavor) {
-        current = currentFlavor
-    }
-
-    @Override
-    SpdtFlavor getCurrent() {
-        return current
-    }
+    //Override
+    SpdtFlavorData current
 }

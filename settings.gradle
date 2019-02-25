@@ -1,1 +1,3 @@
-include ':app', ':spdt-plugin', ':spdt-api', ':spdt-annotation', ':spdt-compiler'
+include ':app', ':spdt-plugin', ':spdt-api',
+        ':spdt-annotation', ':spdt-compiler',
+        ':spdt-data'

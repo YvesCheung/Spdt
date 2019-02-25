@@ -37,10 +37,9 @@ spdt {
         appid = 'yym141and'
     }
 
-    XiaomiMiFlavor {
+    MiFlavor {
         appid = 'yym139and'
     }
 
-    current = XiaomiMiFlavor
+    current = LaotieFlavor
 }
-

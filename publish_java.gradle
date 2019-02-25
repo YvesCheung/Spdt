@@ -46,8 +46,15 @@ task pluginJar(type: Jar, dependsOn: build) {
 
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'
-    if(project.hasProperty("android")) {
+    if (project.hasProperty("android")) {
         from android.sourceSets.main.java.sourceFiles
+    }
+}
+
+task javaSourcesJar(type: Jar) {
+    classifier = 'sources'
+    if (project.hasProperty("sourceSets")) {
+        from sourceSets.main.java.srcDirs
     }
 }
 
@@ -95,9 +102,9 @@ publishToMavenLocal.dependsOn build
 //Fixed Fixed gradle will package annotation class in second build;for detail see java.lang.annotation.RetentionPolicy.SOURCE
 tasks.whenTaskAdded { task ->
     if (task.name == "extractReleaseAnnotations" || task.name == "extractDebugAnnotations") {
-        task.outputs.upToDateWhen {false}
+        task.outputs.upToDateWhen { false }
     }
-    if (task.name == "publishMavenPublicationToMavenRepository" ) {
+    if (task.name == "publishMavenPublicationToMavenRepository") {
         task.dependsOn build
     }
 }
