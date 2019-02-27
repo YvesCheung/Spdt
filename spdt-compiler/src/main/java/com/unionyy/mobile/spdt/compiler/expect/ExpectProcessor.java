@@ -47,6 +47,7 @@ import javax.lang.model.util.ElementFilter;
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 @SupportedAnnotationTypes({
+        "com.unionyy.mobile.spdt.annotation.SpdtActual",
         "com.unionyy.mobile.spdt.annotation.SpdtActual"
 })
 public class ExpectProcessor extends SpdtProcessor {
@@ -207,10 +208,16 @@ public class ExpectProcessor extends SpdtProcessor {
                 TypeName flavorName;
                 if (flavor instanceof Type.ErrorType) {
                     String origin = flavor.toString();
-                    flavorName = ClassName.bestGuess(origin.substring(origin.indexOf(".") + 1));
+                    ClassName guessCls = ClassName.bestGuess(origin.substring(origin.indexOf(".") + 1));
+                    if (guessCls.packageName().isEmpty()) {
+                        flavorName = ClassName.get(env.packageName + ".annotation", guessCls.toString());
+                    } else {
+                        flavorName = guessCls;
+                    }
                 } else {
                     flavorName = TypeName.get(flavor);
                 }
+                log.info("flavorName = " + flavorName, true);
                 createMethodBuilder.addCode(
                         CodeBlock
                                 .builder()

@@ -1,2 +1,3 @@
 com.unionyy.mobile.spdt.compiler.expect.ExpectProcessor
 com.unionyy.mobile.spdt.compiler.flavor.FlavorProcessor
+com.unionyy.mobile.spdt.compiler.inject.InjectProcessor
