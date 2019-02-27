@@ -1,6 +1,7 @@
 package com.unionyy.mobile.spdt.compiler;
 
 import com.google.auto.service.AutoService;
+import com.unionyy.mobile.spdt.compiler.expect.ExpectProcessor;
 import com.unionyy.mobile.spdt.compiler.flavor.FlavorProcessor;
 
 import java.util.Arrays;
@@ -29,41 +30,29 @@ import javax.tools.Diagnostic;
  * <p>
  * apt 最好还是不要生成.kt文件阿
  */
-@AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
-public class SpdtProcessor extends AbstractProcessor {
-
-    private List<IProcessor> list = Arrays.<IProcessor>asList(
-            new FlavorProcessor()
-    );
+public abstract class SpdtProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         Env env = new Env();
         env.filer = processingEnv.getFiler();
         env.elements = processingEnv.getElementUtils();
-        env.messager = processingEnv.getMessager();
+        env.logger = new Logger(processingEnv.getMessager());
         env.types = processingEnv.getTypeUtils();
         env.options = processingEnv.getOptions();
 
         env.packageName = "com.unionyy.mobile.spdt";
 
         try {
-            for (IProcessor p : list) {
-                p.process(env, set, roundEnvironment);
-            }
+            process(env, set, roundEnvironment);
         } catch (Exception e) {
-            env.messager.printMessage(Diagnostic.Kind.ERROR, e.toString());
+            env.logger.error(e.toString());
         }
-        return true;
+        return false;
     }
 
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
-        Set<String> annotations = new LinkedHashSet<>();
-        for (IProcessor p : list) {
-            annotations.addAll(p.getSupportedAnnotationTypes());
-        }
-        return annotations;
-    }
+    protected abstract void process(
+            Env env,
+            Set<? extends TypeElement> set,
+            RoundEnvironment roundEnvironment) throws Exception;
 }

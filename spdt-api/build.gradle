@@ -41,7 +41,7 @@ publishing {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
                 //Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-                def configurationNames = ['compile']
+                def configurationNames = ['compile', 'implementation']
 
                 configurationNames.each { configurationName ->
                     configurations[configurationName].allDependencies.each {

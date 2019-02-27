@@ -32,7 +32,6 @@ publishing {
             groupId 'com.unionyy.mobile'
             artifactId 'spdt'
             artifact("$buildDir/libs/${project.getName()}-${version}.jar")
-            artifact javaSourcesJar
 
             pom.withXml {
                 //Creating additional node for dependencies

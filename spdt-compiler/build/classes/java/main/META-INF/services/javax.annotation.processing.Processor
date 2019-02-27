@@ -1,1 +1,2 @@
-com.unionyy.mobile.spdt.compiler.SpdtProcessor
+com.unionyy.mobile.spdt.compiler.expect.ExpectProcessor
+com.unionyy.mobile.spdt.compiler.flavor.FlavorProcessor

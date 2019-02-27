@@ -29,6 +29,10 @@ dependencies {
     kapt project(":spdt-compiler")
 }
 
+kapt {
+    generateStubs = true
+}
+
 apply plugin: 'spdt'
 
 spdt {
@@ -37,7 +41,7 @@ spdt {
         appid = 'yym141and'
     }
 
-    MiFlavor {
+    XiaoMiFlavor {
         appid = 'yym139and'
     }
 
