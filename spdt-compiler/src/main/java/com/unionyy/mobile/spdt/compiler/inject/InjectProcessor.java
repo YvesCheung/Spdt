@@ -1,30 +1,28 @@
 package com.unionyy.mobile.spdt.compiler.inject;
 
-import com.google.auto.service.AutoService;
 import com.unionyy.mobile.spdt.compiler.Env;
-import com.unionyy.mobile.spdt.compiler.SpdtProcessor;
+import com.unionyy.mobile.spdt.compiler.IProcessor;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
 
-@AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes(
-        "com.unionyy.mobile.spdt.annotation.SpdtInject"
-)
-public class InjectProcessor extends SpdtProcessor {
+public class InjectProcessor implements IProcessor {
 
     @Override
-    protected void process(
+    public void process(
             Env env,
             Set<? extends TypeElement> set,
             RoundEnvironment roundEnvironment) throws Exception {
 
+    }
+
+    @Override
+    public Collection<String> getSupportAnnotations() {
+        return Collections.singletonList(
+                "com.unionyy.mobile.spdt.annotation.SpdtInject");
     }
 }

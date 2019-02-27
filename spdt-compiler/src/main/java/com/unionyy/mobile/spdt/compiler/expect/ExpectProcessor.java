@@ -1,6 +1,5 @@
 package com.unionyy.mobile.spdt.compiler.expect;
 
-import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -16,12 +15,13 @@ import com.unionyy.mobile.spdt.annotation.SpdtActual;
 import com.unionyy.mobile.spdt.annotation.SpdtExpect;
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor;
 import com.unionyy.mobile.spdt.compiler.Env;
+import com.unionyy.mobile.spdt.compiler.IProcessor;
 import com.unionyy.mobile.spdt.compiler.Logger;
-import com.unionyy.mobile.spdt.compiler.SpdtProcessor;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -31,11 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
@@ -44,13 +40,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
-@AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes({
-        "com.unionyy.mobile.spdt.annotation.SpdtActual",
-        "com.unionyy.mobile.spdt.annotation.SpdtActual"
-})
-public class ExpectProcessor extends SpdtProcessor {
+public class ExpectProcessor implements IProcessor {
 
     private Logger log;
 
@@ -350,5 +340,12 @@ public class ExpectProcessor extends SpdtProcessor {
             }
             return false;
         }
+    }
+
+    @Override
+    public Collection<String> getSupportAnnotations() {
+        return Arrays.asList(
+                "com.unionyy.mobile.spdt.annotation.SpdtActual",
+                "com.unionyy.mobile.spdt.annotation.spdtExpect");
     }
 }

@@ -1,6 +1,5 @@
 package com.unionyy.mobile.spdt.compiler.flavor;
 
-import com.google.auto.service.AutoService;
 import com.google.gson.Gson;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -9,7 +8,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor;
 import com.unionyy.mobile.spdt.compiler.Env;
-import com.unionyy.mobile.spdt.compiler.SpdtProcessor;
+import com.unionyy.mobile.spdt.compiler.IProcessor;
 import com.unionyy.mobile.spdt.data.SpdtConfigData;
 import com.unionyy.mobile.spdt.data.SpdtFlavorData;
 
@@ -21,25 +20,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
-@AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes(
-        "com.unionyy.mobile.spdt.annotation.SpdtExpect"
-)
-public class FlavorProcessor extends SpdtProcessor {
+public class FlavorProcessor implements IProcessor {
 
     @Override
-    protected void process(
+    public void process(
             final Env env,
             Set<? extends TypeElement> set,
             RoundEnvironment roundEnvironment) throws Exception {
@@ -133,5 +126,10 @@ public class FlavorProcessor extends SpdtProcessor {
         } catch (IOException e) {
             env.logger.warn(e.getMessage());
         }
+    }
+
+    @Override
+    public Collection<String> getSupportAnnotations() {
+        return Collections.singletonList("com.unionyy.mobile.spdt.annotation.SpdtExpect");
     }
 }

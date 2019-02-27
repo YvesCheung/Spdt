@@ -21,7 +21,7 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation project(":spdt-annotation")
+    api project(":spdt-annotation")
 }
 
 apply from: '../publish_java.gradle'
@@ -41,7 +41,7 @@ publishing {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
                 //Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-                def configurationNames = ['compile', 'implementation']
+                def configurationNames = ['compile', 'implementation', 'api']
 
                 configurationNames.each { configurationName ->
                     configurations[configurationName].allDependencies.each {

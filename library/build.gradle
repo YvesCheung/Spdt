@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'spdt'
 
 android {
     compileSdkVersion 28
@@ -21,10 +22,10 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation project(":spdt-annotation")
+    implementation project(":spdt-api")
     kapt project(":spdt-compiler")
 }
-
-apply plugin: 'spdt'
 
 spdt {
 

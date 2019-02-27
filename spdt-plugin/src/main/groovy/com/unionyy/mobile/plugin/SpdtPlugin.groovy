@@ -5,11 +5,14 @@ import com.android.build.gradle.LibraryPlugin
 import com.google.gson.Gson
 import com.unionyy.mobile.spdt.data.SpdtConfigData
 import com.unionyy.mobile.spdt.data.SpdtFlavorData
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Namer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.internal.reflect.DirectInstantiator
+import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
 
 /**
  * Created by 张宇 on 2019/2/21.
@@ -31,6 +34,8 @@ class SpdtPlugin implements Plugin<Project> {
     void apply(Project project) {
         println("Spdt apply ${project.name}")
 
+        addDependency(project)
+
         def config = project.extensions.create(SpdtConfigContainer, "spdt", DefaultSpdtConfigContainer,
                 initializer, namer)
 
@@ -43,7 +48,30 @@ class SpdtPlugin implements Plugin<Project> {
                 writeConfigToFile(config, file)
             }
         }
+    }
 
+    private static void addDependency(Project project) {
+        Action<? super AppliedPlugin> addSpdtDependency = new Action<AppliedPlugin>() {
+            @Override
+            void execute(AppliedPlugin appliedPlugin) {
+                project.dependencies {
+                    project.dependencies.add("implementation", project.project(":spdt-api"))
+                    project.dependencies.add("implementation", project.project(":spdt-annotation"))
+                }
+            }
+        }
+        project.pluginManager.withPlugin("com.android.library", addSpdtDependency)
+        project.pluginManager.withPlugin("com.android.application", addSpdtDependency)
+
+        project.afterEvaluate {
+            if (project.plugins.hasPlugin('kotlin-android')
+                    || project.plugins.hasPlugin('kotlin-kapt')) {
+                project.dependencies.add("kapt", project.project(":spdt-compiler"))
+            } else if (project.plugins.hasPlugin('com.android.library')
+                    || project.plugins.hasPlugin('com.android.application')) {
+                project.dependencies.add("annotationProcessor", project.project(":spdt-compiler"))
+            }
+        }
     }
 
     private static writeConfigToFile(SpdtConfigContainer config, File file) {
@@ -86,19 +114,23 @@ class SpdtPlugin implements Plugin<Project> {
     }
 
     private void processAptParam(Project project, File configFile) {
-        if ((project.plugins.hasPlugin(AppPlugin)
-                || project.plugins.hasPlugin(LibraryPlugin))
-                && project.android != null) {
-
-            project.android {
-                defaultConfig {
-                    javaCompileOptions {
-                        annotationProcessorOptions {
-                            it.argument('spdt_config_file', configFile.absolutePath)
+        Action<? super AppliedPlugin> addAptParam = new Action<AppliedPlugin>() {
+            @Override
+            void execute(AppliedPlugin appliedPlugin) {
+                if (project.android != null) {
+                    project.android {
+                        defaultConfig {
+                            javaCompileOptions {
+                                annotationProcessorOptions {
+                                    it.argument('spdt_config_file', configFile.absolutePath)
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+        project.pluginManager.withPlugin("com.android.library", addAptParam)
+        project.pluginManager.withPlugin("com.android.application", addAptParam)
     }
 }
