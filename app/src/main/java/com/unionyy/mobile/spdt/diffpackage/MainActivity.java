@@ -10,8 +10,8 @@ import com.unionyy.mobile.spdt.annotation.SpdtInject;
 @SuppressWarnings("WeakerAccess")
 public class MainActivity {
 
-//    @SpdtInject
-//    B theB;
+    @SpdtInject
+    B theB;
 
     @SpdtInject
     AppidGetter $ss;

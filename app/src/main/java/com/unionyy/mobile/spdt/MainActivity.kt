@@ -12,6 +12,9 @@ class MainActivity : AppCompatActivity() {
     @SpdtInject
     lateinit var getter: AppidGetter
 
+    @SpdtInject
+    lateinit var `我是中文`: AppidGetter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
