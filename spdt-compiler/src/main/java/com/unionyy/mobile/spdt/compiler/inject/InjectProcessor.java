@@ -6,7 +6,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.unionyy.mobile.spdt.annotation.SpdtInject;
 import com.unionyy.mobile.spdt.compiler.Env;
 import com.unionyy.mobile.spdt.compiler.IProcessor;
@@ -20,9 +19,13 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.ElementFilter;
 
 public class InjectProcessor implements IProcessor {
 
@@ -35,66 +38,59 @@ public class InjectProcessor implements IProcessor {
             RoundEnvironment roundEnvironment) throws Exception {
         logger = env.logger;
 
-        // Java中的变量类型为Symbol$VarSymbol，Kotlin中的变量类型为Symbol$MethodSymbol
-        Set<Symbol> injectedSymbols
-                = (Set<Symbol>) roundEnvironment.getElementsAnnotatedWith(SpdtInject.class);
+        Set<VariableElement> injectedSymbols
+                = ElementFilter.fieldsIn(roundEnvironment.getElementsAnnotatedWith(SpdtInject.class));
 
-        Map<ClassSymbol, Set<Symbol>> classifiedSymbols = classifySymbols(injectedSymbols);
+        Map<Element, Set<VariableElement>> classifiedElements = classifySymbols(injectedSymbols);
 
-        generateInjetorClass(classifiedSymbols, env);
+        generateInjectorClass(classifiedElements, env.filer);
     }
 
-    private Map<ClassSymbol, Set<Symbol>> classifySymbols(Set<Symbol> injectedSymbols) {
-        Map<ClassSymbol, Set<Symbol>> result = new LinkedHashMap<>();
-        for (Symbol symbol : injectedSymbols) {
-            ClassSymbol classSymbol = symbol.enclClass();
-            Set<Symbol> symbols = result.get(classSymbol);
-            if (symbols == null) {
-                symbols = new LinkedHashSet<>();
-                result.put(classSymbol, symbols);
+    private Map<Element, Set<VariableElement>> classifySymbols(Set<VariableElement> injectedSymbols) {
+        Map<Element, Set<VariableElement>> result = new LinkedHashMap<>();
+        for (VariableElement element : injectedSymbols) {
+            Element classElement = element.getEnclosingElement();
+            Set<VariableElement> variableElements = result.get(classElement);
+            if (variableElements == null) {
+                variableElements = new LinkedHashSet<>();
+                result.put(classElement, variableElements);
             }
-            symbols.add(symbol);
+            variableElements.add(element);
         }
         return result;
     }
 
-    private void generateInjetorClass(Map<ClassSymbol, Set<Symbol>> classifiedSymbols, Env env) {
-        for (ClassSymbol classSymbol : classifiedSymbols.keySet()) {
-            TypeName factoryCls = ClassName.get(classSymbol.packge().toString()
-                    , "AppidGetter$$SpdtFactory");
-
+    private void generateInjectorClass(Map<Element, Set<VariableElement>> classifiedElements, Filer filer) {
+        for (Element classElement : classifiedElements.keySet()) {
             MethodSpec.Builder methodBuild = MethodSpec
                     .methodBuilder("inject")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addParameter(ClassName.get(classSymbol.asType()), "activity")
+                    .addParameter(ClassName.get(classElement.asType()), "target")
                     .returns(TypeName.VOID);
 
-            for (Symbol symbol : classifiedSymbols.get(classSymbol)) {
-                // Kotlin中的变量名字会有 $annotation 后缀？
-                String symbolName = String.valueOf(symbol.name.toString().contains("$annotation") ?
-                        symbol.name.subSequence(0, symbol.name.toString().indexOf("$annotation"))
-                        : symbol.name);
+            for (VariableElement element : classifiedElements.get(classElement)) {
+                String elementName = element.getSimpleName().toString();
+                TypeName factoryCls = ClassName.get(((Symbol.VarSymbol) element).type);
 
-                // 变量不能被修饰为private或者protected
-                if (symbol.getModifiers().contains(Modifier.PRIVATE) ||
-                        symbol.getModifiers().contains(Modifier.PROTECTED)) {
-                    logger.error(String.format("The property '%s' of '%s' should not be modified with" +
-                            " private or protected.", symbolName, classSymbol.getSimpleName()));
+                // 变量不能被修饰为private
+                if (element.getModifiers().contains(Modifier.PRIVATE)) {
+                    logger.error(String.format("The property '%s' of '%s' should not be modified" +
+                            " with private.", elementName, classElement.getSimpleName()));
                 }
 
-                // 变量的类型必须为AppidGetter
-
-                methodBuild.addStatement("activity.$N = new $T().create()", symbolName, factoryCls);
+                methodBuild.addStatement("target.$N = new $N().create()",
+                        elementName,
+                        factoryCls + "$$SpdtFactory");
             }
 
             TypeSpec injectCls = TypeSpec
-                    .classBuilder(classSymbol.getSimpleName() + "$$SpdtInjector")
+                    .classBuilder(classElement.getSimpleName() + "$$SpdtInjector")
                     .addModifiers(Modifier.FINAL)
                     .addMethod(methodBuild.build())
                     .build();
 
             try {
-                JavaFile.builder(classSymbol.packge().toString(), injectCls).build().writeTo(env.filer);
+                JavaFile.builder(((Symbol.ClassSymbol) classElement).packge().toString(), injectCls).build().writeTo(filer);
             } catch (IOException e) {
                 logger.warn(e.getMessage());
             }

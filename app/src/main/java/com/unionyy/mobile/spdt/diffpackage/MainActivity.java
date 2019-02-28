@@ -20,6 +20,6 @@ public class MainActivity {
     public void test(Context context) {
         Spdt.inject(this);
 
-        Toast.makeText(context, /*theB.print() +*/ $ss.getAppid(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, theB.print() + $ss.getAppid(), Toast.LENGTH_LONG).show();
     }
 }
