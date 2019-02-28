@@ -207,7 +207,6 @@ public class ExpectProcessor implements IProcessor {
                 } else {
                     flavorName = TypeName.get(flavor);
                 }
-                log.info("flavorName = " + flavorName, true);
                 createMethodBuilder.addCode(
                         CodeBlock
                                 .builder()
