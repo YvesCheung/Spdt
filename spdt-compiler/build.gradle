@@ -30,7 +30,7 @@ publishing {
             groupId 'com.unionyy.mobile'
             artifactId 'spdt-compiler'
             // Tell maven to prepare the generated "*.aar" file for publishing
-            artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            artifact("$buildDir/libs/${project.getName()}-${version}.jar")
             artifact androidSourcesJar
 
             pom.withXml {
