@@ -86,8 +86,9 @@ public class InjectProcessor implements IProcessor {
                         factoryCls + "$$SpdtFactory");
             }
 
+            String flatName = ((Symbol.ClassSymbol) classElement).flatname.toString();
             TypeSpec injectCls = TypeSpec
-                    .classBuilder(classElement.getSimpleName() + "$$SpdtInjector")
+                    .classBuilder(flatName.substring(flatName.lastIndexOf(".") + 1) + "$$SpdtInjector")
                     .addModifiers(Modifier.FINAL)
                     .addMethod(methodBuild.build())
                     .addAnnotation(SpdtKeep.class)

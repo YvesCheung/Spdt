@@ -20,6 +20,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         Spdt.inject(this)
-        textView.text = getter.appid
+        val test = Test()
+//        Spdt.inject(test) // 也可以
+        textView.text = test.test.appid
+    }
+
+    class Test {
+
+        @SpdtInject
+        lateinit var test: AppidGetter
+
+        init {
+            Spdt.inject(this)
+        }
     }
 }
