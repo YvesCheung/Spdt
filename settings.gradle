@@ -1,3 +1,10 @@
-include ':app', ':library', ':spdt-plugin', ':spdt-api',
+static def isJenkins() {
+    return System.getenv("BUILD_NUMBER") != null
+}
+
+if (!isJenkins()) { //本地才包含demo
+    include ':app', ':library'
+}
+include ':spdt-plugin', ':spdt-api',
         ':spdt-annotation', ':spdt-compiler',
         ':spdt-data'
