@@ -18,4 +18,10 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-keep @com.unionyy.mobile.spdt.annotation.SpdtKeep class * {*;}
+-keep class * {
+    @com.unionyy.mobile.spdt.annotation.SpdtKeep <fields>;
+}
+-keepclassmembers class * {
+    @com.unionyy.mobile.spdt.annotation.SpdtKeep <methods>;
+}

@@ -14,6 +14,7 @@ import com.sun.tools.javac.code.Type.ClassType;
 import com.unionyy.mobile.spdt.annotation.SpdtActual;
 import com.unionyy.mobile.spdt.annotation.SpdtExpect;
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor;
+import com.unionyy.mobile.spdt.annotation.SpdtKeep;
 import com.unionyy.mobile.spdt.compiler.Env;
 import com.unionyy.mobile.spdt.compiler.IProcessor;
 import com.unionyy.mobile.spdt.compiler.Logger;
@@ -230,6 +231,7 @@ public class ExpectProcessor implements IProcessor {
                     .addSuperinterface(baseFactory)
                     .addModifiers(Modifier.FINAL)
                     .addMethod(createMethod)
+                    .addAnnotation(SpdtKeep.class)
                     .build();
 
             try {

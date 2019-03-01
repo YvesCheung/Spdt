@@ -7,9 +7,12 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.sun.tools.javac.code.Symbol;
 import com.unionyy.mobile.spdt.annotation.SpdtInject;
+import com.unionyy.mobile.spdt.annotation.SpdtKeep;
 import com.unionyy.mobile.spdt.compiler.Env;
 import com.unionyy.mobile.spdt.compiler.IProcessor;
 import com.unionyy.mobile.spdt.compiler.Logger;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -46,7 +49,7 @@ public class InjectProcessor implements IProcessor {
         generateInjectorClass(classifiedElements, env.filer);
     }
 
-    private Map<Element, Set<VariableElement>> classifySymbols(Set<VariableElement> injectedSymbols) {
+    private Map<Element, Set<VariableElement>> classifySymbols(@NotNull Set<VariableElement> injectedSymbols) {
         Map<Element, Set<VariableElement>> result = new LinkedHashMap<>();
         for (VariableElement element : injectedSymbols) {
             Element classElement = element.getEnclosingElement();
@@ -60,7 +63,7 @@ public class InjectProcessor implements IProcessor {
         return result;
     }
 
-    private void generateInjectorClass(Map<Element, Set<VariableElement>> classifiedElements, Filer filer) {
+    private void generateInjectorClass(@NotNull Map<Element, Set<VariableElement>> classifiedElements, Filer filer) {
         for (Element classElement : classifiedElements.keySet()) {
             MethodSpec.Builder methodBuild = MethodSpec
                     .methodBuilder("inject")
@@ -87,6 +90,7 @@ public class InjectProcessor implements IProcessor {
                     .classBuilder(classElement.getSimpleName() + "$$SpdtInjector")
                     .addModifiers(Modifier.FINAL)
                     .addMethod(methodBuild.build())
+                    .addAnnotation(SpdtKeep.class)
                     .build();
 
             try {
