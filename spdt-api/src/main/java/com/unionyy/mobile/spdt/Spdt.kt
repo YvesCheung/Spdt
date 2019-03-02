@@ -9,18 +9,17 @@ object Spdt {
         val injectCls = "${obj.javaClass.name}\$\$SpdtInjector"
         try {
             Class.forName(injectCls)
-                    .getMethod("inject", obj.javaClass)
-                    .invoke(null, obj)
-        } catch (e: ClassNotFoundException) {
-            // 未使用注解，调用此方法会导致ClassNotFound异常
-            e.printStackTrace()
+                .getMethod("inject", obj.javaClass)
+                .invoke(null, obj)
+        } catch (e: Exception) {
+            throw RuntimeException("Could not Spdt#inject the object '$obj' " +
+                "because '$injectCls' is invalid.")
         }
-
     }
 
     @JvmStatic
     fun <Spdt : Any> of(spdtCls: Class<Spdt>): Spdt = ofOrNull(spdtCls)
-            ?: throw RuntimeException("Could not initialize the Spdt class '$spdtCls'")
+        ?: throw RuntimeException("Could not initialize the Spdt class '$spdtCls'")
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
@@ -28,8 +27,8 @@ object Spdt {
         val clsName = "${spdtCls.canonicalName}\$\$SpdtFactory"
         return try {
             val factory: SpdtExpectToActualFactory<Spdt>? =
-                    Class.forName(clsName).newInstance()
-                            as? SpdtExpectToActualFactory<Spdt>
+                Class.forName(clsName).newInstance()
+                    as? SpdtExpectToActualFactory<Spdt>
             factory?.create()
         } catch (ignore: Exception) {
             null

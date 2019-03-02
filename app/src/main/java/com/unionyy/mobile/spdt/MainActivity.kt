@@ -1,11 +1,11 @@
 package com.unionyy.mobile.spdt
 
+import android.app.Activity
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import com.unionyy.mobile.spdt.annotation.SpdtInject
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
 //    private val getter = Spdt.currentFlavor()
 

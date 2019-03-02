@@ -51,24 +51,23 @@ class SpdtPlugin implements Plugin<Project> {
     }
 
     private static void addDependency(Project project) {
-        Action<? super AppliedPlugin> addSpdtDependency = new Action<AppliedPlugin>() {
+        def addSpdtDependency = new Action<AppliedPlugin>() {
             @Override
             void execute(AppliedPlugin appliedPlugin) {
-                project.dependencies {
-                    project.dependencies.add("implementation", project.project(":spdt-api"))
-                    project.dependencies.add("implementation", project.project(":spdt-annotation"))
-                }
+                project.dependencies.add("implementation", project.project(":spdt-api"))
+                project.dependencies.add("implementation", project.project(":spdt-annotation"))
             }
         }
         project.pluginManager.withPlugin("com.android.library", addSpdtDependency)
         project.pluginManager.withPlugin("com.android.application", addSpdtDependency)
+        project.pluginManager.withPlugin("kotlin-android") {
+            project.dependencies.add("kapt", project.project(":spdt-compiler"))
+        }
 
         project.afterEvaluate {
-            if (project.plugins.hasPlugin('kotlin-android')
-                    || project.plugins.hasPlugin('kotlin-kapt')) {
-                project.dependencies.add("kapt", project.project(":spdt-compiler"))
-            } else if (project.plugins.hasPlugin('com.android.library')
-                    || project.plugins.hasPlugin('com.android.application')) {
+            if ((project.plugins.hasPlugin('com.android.library')
+                    || project.plugins.hasPlugin('com.android.application'))
+                    && !project.plugins.hasPlugin('kotlin-android')) {
                 project.dependencies.add("annotationProcessor", project.project(":spdt-compiler"))
             }
         }
