@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import com.unionyy.mobile.spdt.annotation.SpdtInject
-import com.unionyy.mobile.spdt.diffpackage.B
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : Activity() {
