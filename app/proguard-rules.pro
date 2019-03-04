@@ -18,10 +18,10 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
+-keepnames class * extends android.app.Activity
+
 -keep @com.unionyy.mobile.spdt.annotation.SpdtKeep class * {*;}
--keep class * {
-    @com.unionyy.mobile.spdt.annotation.SpdtKeep <fields>;
-}
--keepclassmembers class * {
-    @com.unionyy.mobile.spdt.annotation.SpdtKeep <methods>;
-}
+
+-whyareyoukeeping class com.unionyy.mobile.spdt.AppidGetter
+-whyareyoukeeping class com.unionyy.mobile.spdt.diffpackage.B
+-whyareyoukeeping class com.unionyy.mobile.spdt.diffpackage.MainActivity

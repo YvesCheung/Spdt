@@ -13,7 +13,7 @@ object Spdt {
                 .invoke(null, obj)
         } catch (e: Exception) {
             throw RuntimeException("Could not Spdt#inject the object '$obj' " +
-                "because '$injectCls' is invalid.")
+                "because '$injectCls' is invalid.", e)
         }
     }
 

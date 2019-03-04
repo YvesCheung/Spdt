@@ -7,6 +7,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor;
+import com.unionyy.mobile.spdt.annotation.SpdtKeep;
 import com.unionyy.mobile.spdt.compiler.Env;
 import com.unionyy.mobile.spdt.compiler.IProcessor;
 import com.unionyy.mobile.spdt.data.SpdtConfigData;
@@ -115,6 +116,7 @@ public class FlavorProcessor implements IProcessor {
         TypeSpec spdtFactory = TypeSpec
                 .classBuilder("SpdtFlavor$$SpdtFactory")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addAnnotation(SpdtKeep.class)
                 .addMethod(createMethod)
                 .addSuperinterface(superFactory)
                 .build();
