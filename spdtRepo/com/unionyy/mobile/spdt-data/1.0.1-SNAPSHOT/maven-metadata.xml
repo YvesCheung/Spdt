@@ -2,11 +2,12 @@
 <metadata>
   <groupId>com.unionyy.mobile</groupId>
   <artifactId>spdt-data</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
   <versioning>
-    <versions>
-      <version>1.0.0-SNAPSHOT</version>
-      <version>1.0.1-SNAPSHOT</version>
-    </versions>
+    <snapshot>
+      <timestamp>20190305.054012</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
     <lastUpdated>20190305054012</lastUpdated>
   </versioning>
 </metadata>

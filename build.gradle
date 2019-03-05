@@ -9,7 +9,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        if (!isJenkins()) {
+
+        if (System.getenv("BUILD_NUMBER") == null) {
             classpath "com.unionyy.mobile:spdt:$version"
         }
         // NOTE: Do not place your application dependencies here; they belong
@@ -27,8 +28,4 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-static def isJenkins() {
-    return System.getenv("BUILD_NUMBER") != null
 }
