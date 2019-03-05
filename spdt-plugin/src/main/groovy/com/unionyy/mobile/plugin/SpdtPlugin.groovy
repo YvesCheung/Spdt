@@ -52,9 +52,7 @@ class SpdtPlugin implements Plugin<Project> {
 
     private static void addDependency(Project project) {
 
-        def version = project.rootProject.version?.toString()
-        if (version == null)
-            throw new GradleException("You should specify a version in the root project.")
+        def version = "1.0.1-SNAPSHOT"
 
         def getDepend = { String module ->
             def moduleProject = project.findProject(":$module")
