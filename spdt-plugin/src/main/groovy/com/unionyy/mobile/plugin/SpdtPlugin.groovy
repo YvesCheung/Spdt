@@ -51,28 +51,38 @@ class SpdtPlugin implements Plugin<Project> {
     }
 
     private static void addDependency(Project project) {
+
+        def version = project.rootProject.version?.toString()
+        if (version == null)
+            throw new GradleException("You should specify a version in the root project.")
+
+        def getDepend = { String module ->
+            def moduleProject = project.findProject(":$module")
+            if (moduleProject != null) {
+                return moduleProject
+            } else {
+                return "com.unionyy.mobile:$module:$version"
+            }
+        }
+
         def addSpdtDependency = new Action<AppliedPlugin>() {
             @Override
             void execute(AppliedPlugin appliedPlugin) {
-                project.dependencies.add("implementation",
-                        "com.unionyy.mobile:spdt-api:1.0.0-SNAPSHOT")
-                project.dependencies.add("implementation",
-                        "com.unionyy.mobile:spdt-annotation:1.0.0-SNAPSHOT")
+                project.dependencies.add("implementation", getDepend("spdt-api"))
+                project.dependencies.add("implementation", getDepend("spdt-annotation"))
             }
         }
         project.pluginManager.withPlugin("com.android.library", addSpdtDependency)
         project.pluginManager.withPlugin("com.android.application", addSpdtDependency)
         project.pluginManager.withPlugin("kotlin-android") {
-            project.dependencies.add("kapt",
-                    "com.unionyy.mobile:spdt-compiler:1.0.0-SNAPSHOT")
+            project.dependencies.add("kapt", getDepend("spdt-compiler"))
         }
 
         project.afterEvaluate {
             if ((project.plugins.hasPlugin('com.android.library')
                     || project.plugins.hasPlugin('com.android.application'))
                     && !project.plugins.hasPlugin('kotlin-android')) {
-                project.dependencies.add("annotationProcessor",
-                        "com.unionyy.mobile:spdt-compiler:1.0.0-SNAPSHOT")
+                project.dependencies.add("annotationProcessor", getDepend("spdt-compiler"))
             }
         }
     }

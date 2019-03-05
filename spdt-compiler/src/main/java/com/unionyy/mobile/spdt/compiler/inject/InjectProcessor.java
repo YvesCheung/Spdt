@@ -44,36 +44,43 @@ public class InjectProcessor implements IProcessor {
         Set<VariableElement> injectedSymbols
                 = ElementFilter.fieldsIn(roundEnvironment.getElementsAnnotatedWith(SpdtInject.class));
 
-        Map<Element, Set<VariableElement>> classifiedElements = classifySymbols(injectedSymbols);
+        Map<TypeElement, Set<VariableElement>> classifiedElements = classifySymbols(injectedSymbols);
 
         generateInjectorClass(classifiedElements, env.filer);
     }
 
-    private Map<Element, Set<VariableElement>> classifySymbols(@NotNull Set<VariableElement> injectedSymbols) {
-        Map<Element, Set<VariableElement>> result = new LinkedHashMap<>();
+    private Map<TypeElement, Set<VariableElement>> classifySymbols(@NotNull Set<VariableElement> injectedSymbols) {
+        Map<TypeElement, Set<VariableElement>> result = new LinkedHashMap<>();
         for (VariableElement element : injectedSymbols) {
             Element classElement = element.getEnclosingElement();
-            Set<VariableElement> variableElements = result.get(classElement);
-            if (variableElements == null) {
-                variableElements = new LinkedHashSet<>();
-                result.put(classElement, variableElements);
+            if (classElement instanceof TypeElement) {
+                Set<VariableElement> variableElements = result.get(classElement);
+                if (variableElements == null) {
+                    variableElements = new LinkedHashSet<>();
+                    result.put((TypeElement) classElement, variableElements);
+                }
+                variableElements.add(element);
+            } else {
+                logger.error("Why '" + classElement + "' is not a class?");
             }
-            variableElements.add(element);
+
         }
         return result;
     }
 
-    private void generateInjectorClass(@NotNull Map<Element, Set<VariableElement>> classifiedElements, Filer filer) {
-        for (Element classElement : classifiedElements.keySet()) {
+    private void generateInjectorClass(@NotNull Map<TypeElement, Set<VariableElement>> classifiedElements, Filer filer) {
+        for (TypeElement classElement : classifiedElements.keySet()) {
             MethodSpec.Builder methodBuild = MethodSpec
                     .methodBuilder("inject")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addParameter(ClassName.get(classElement.asType()), "target")
+                    .addParameter(ClassName.get(classElement), "target")
                     .returns(TypeName.VOID);
 
             for (VariableElement element : classifiedElements.get(classElement)) {
                 String elementName = element.getSimpleName().toString();
-                TypeName factoryCls = ClassName.get(((Symbol.VarSymbol) element).type);
+
+                ClassName variableType = (ClassName) ClassName.get(element.asType());
+                ClassName factoryCls = ClassName.bestGuess(variableType.reflectionName() + "$$SpdtFactory");
 
                 // 变量不能被修饰为private
                 if (element.getModifiers().contains(Modifier.PRIVATE)) {
@@ -81,12 +88,10 @@ public class InjectProcessor implements IProcessor {
                             " with private.", elementName, classElement.getSimpleName()));
                 }
 
-                methodBuild.addStatement("target.$N = new $N().create()",
-                        elementName,
-                        factoryCls + "$$SpdtFactory");
+                methodBuild.addStatement("target.$N = new $T().create()",
+                        elementName, factoryCls);
             }
-
-            String flatName = ((Symbol.ClassSymbol) classElement).flatname.toString();
+            String flatName = ClassName.get(classElement).reflectionName();
             TypeSpec injectCls = TypeSpec
                     .classBuilder(flatName.substring(flatName.lastIndexOf(".") + 1) + "$$SpdtInjector")
                     .addModifiers(Modifier.FINAL)
