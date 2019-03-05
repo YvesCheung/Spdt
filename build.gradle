@@ -17,6 +17,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'http://repo.yypm.com:8181/nexus/content/groups/public' }
         google()
         jcenter()
     }
