@@ -69,7 +69,7 @@ uploadArchives {
     repositories.mavenDeployer {
         repository(url: uri('../spdtRepo'))
         pom.groupId = 'com.unionyy.mobile'
-        pom.artifactId = 'spdt-plugin'
+        pom.artifactId = 'spdt'
         pom.version = version
     }
 }
