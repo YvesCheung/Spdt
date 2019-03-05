@@ -7,5 +7,8 @@ inline fun <reified T : Any> spdtInject(): ReadOnlyProperty<Any, T> = SpdtProxy(
 
 class SpdtProxy<SpdtObj : Any>(private val cls: Class<SpdtObj>) : ReadOnlyProperty<Any, SpdtObj> {
 
-    override fun getValue(thisRef: Any, property: KProperty<*>): SpdtObj = Spdt.of(cls)
+    private var _value: SpdtObj? = null
+
+    override fun getValue(thisRef: Any, property: KProperty<*>): SpdtObj =
+        _value ?: Spdt.of(cls).also { _value = it }
 }
