@@ -1,7 +1,7 @@
 package com.yy.mobile.uniondif
 
 import com.unionyy.mobile.spdt.annotation.SpdtExpect
-import com.unionyy.mobile.spdt.annotation.SpdtInject
+import com.unionyy.mobile.spdt.spdtInject
 
 /**
  * Created by wangfeihang on 2019/1/23.
@@ -19,7 +19,6 @@ class OuterClass {
         }
 
         @JvmStatic
-        @SpdtInject
-        lateinit var appIds: AppIds
+        val appIds: AppIds by spdtInject()
     }
 }

@@ -20,22 +20,22 @@ object Spdt {
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun <Spdt : Any> of(spdtCls: Class<Spdt>): Spdt {
-        val clsName = "${spdtCls.canonicalName}\$\$SpdtFactory"
+        val clsName = "${spdtCls.name}\$\$SpdtFactory"
         return try {
             val factory: SpdtExpectToActualFactory<Spdt> =
                 Class.forName(clsName).newInstance()
                     as SpdtExpectToActualFactory<Spdt>
             factory.create()
                 ?: throw RuntimeException("The create() method in '$clsName' return null.")
-        } catch (ignore: Exception) {
-            throw RuntimeException("Could not initialize the Spdt class '$spdtCls'")
+        } catch (error: Exception) {
+            throw RuntimeException("Could not initialize the Spdt class '$spdtCls'", error)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun <Spdt : Any> ofOrNull(spdtCls: Class<Spdt>): Spdt? {
-        val clsName = "${spdtCls.canonicalName}\$\$SpdtFactory"
+        val clsName = "${spdtCls.name}\$\$SpdtFactory"
         return try {
             val factory: SpdtExpectToActualFactory<Spdt>? =
                 Class.forName(clsName).newInstance()
