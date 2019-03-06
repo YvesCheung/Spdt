@@ -1,5 +1,6 @@
 package com.unionyy.mobile.spdt
 
+import android.util.LruCache
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor
 
 object Spdt {
@@ -22,9 +23,10 @@ object Spdt {
     fun <Spdt : Any> of(spdtCls: Class<Spdt>): Spdt {
         val clsName = "${spdtCls.name}\$\$SpdtFactory"
         return try {
-            val factory: SpdtExpectToActualFactory<Spdt> =
-                Class.forName(clsName).newInstance()
-                    as SpdtExpectToActualFactory<Spdt>
+            val factory: SpdtExpectToActualFactory<Spdt> = getOrNew(clsName) {
+                Class.forName(clsName).newInstance() as SpdtExpectToActualFactory<Spdt>
+            } ?: throw RuntimeException("The method getOrNew('$clsName') return null.")
+
             factory.create()
                 ?: throw RuntimeException("The create() method in '$clsName' return null.")
         } catch (error: Exception) {
@@ -37,9 +39,10 @@ object Spdt {
     fun <Spdt : Any> ofOrNull(spdtCls: Class<Spdt>): Spdt? {
         val clsName = "${spdtCls.name}\$\$SpdtFactory"
         return try {
-            val factory: SpdtExpectToActualFactory<Spdt>? =
-                Class.forName(clsName).newInstance()
-                    as? SpdtExpectToActualFactory<Spdt>
+            val factory: SpdtExpectToActualFactory<Spdt>? = getOrNew(clsName) {
+                Class.forName(clsName).newInstance() as SpdtExpectToActualFactory<Spdt>
+            }
+
             factory?.create()
         } catch (ignore: Exception) {
             null
@@ -48,4 +51,21 @@ object Spdt {
 
     @JvmStatic
     fun currentFlavor(): SpdtFlavor = of(SpdtFlavor::class.java)
+
+    private val cache = LruCache<String, SpdtExpectToActualFactory<*>>(100)
+
+    @Suppress("UNCHECKED_CAST")
+    private inline fun <Spdt : Any> getOrNew(
+        clsName: String,
+        newInstance: () -> SpdtExpectToActualFactory<Spdt>?
+    ): SpdtExpectToActualFactory<Spdt>? {
+        val factory: SpdtExpectToActualFactory<*>? = cache[clsName]
+        return if (factory == null) {
+            newInstance().also {
+                cache.put(clsName, it)
+            }
+        } else {
+            factory as SpdtExpectToActualFactory<Spdt>
+        }
+    }
 }

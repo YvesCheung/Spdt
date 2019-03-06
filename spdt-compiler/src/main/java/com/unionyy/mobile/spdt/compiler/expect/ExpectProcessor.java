@@ -229,7 +229,7 @@ public class ExpectProcessor implements IProcessor {
             TypeSpec factoryCls = TypeSpec
                     .classBuilder(className + "$$SpdtFactory")
                     .addSuperinterface(baseFactory)
-                    .addModifiers(Modifier.FINAL)
+                    .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
                     .addMethod(createMethod)
                     .addAnnotation(SpdtKeep.class)
                     .build();
