@@ -15,6 +15,7 @@ import com.unionyy.mobile.spdt.annotation.SpdtActual;
 import com.unionyy.mobile.spdt.annotation.SpdtExpect;
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor;
 import com.unionyy.mobile.spdt.annotation.SpdtKeep;
+import com.unionyy.mobile.spdt.api.DefaultFlavor;
 import com.unionyy.mobile.spdt.compiler.Env;
 import com.unionyy.mobile.spdt.compiler.IProcessor;
 import com.unionyy.mobile.spdt.compiler.Logger;
@@ -22,6 +23,7 @@ import com.unionyy.mobile.spdt.compiler.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -124,23 +126,35 @@ public class ExpectProcessor implements IProcessor {
             TypeMirror expect = entry.getKey();
             Set<TypeElement> actuals = entry.getValue();
 
-            Map<TypeMirrorWrapper, TypeElement> checkDuplicate = new LinkedHashMap<>(4);
+            Map<TypeMirrorWrapper, TypeElement> checkDuplicate = new LinkedHashMap<>();
             for (TypeElement actualCls : actuals) {
-                TypeMirror flavor = getAnnotationParam(actualCls, SpdtActual.class, "value");
-                if (flavor == null) { //error
-                    return Collections.emptyMap();
-                }
-                TypeMirrorWrapper wrapper = TypeMirrorWrapper.of(flavor);
-                TypeElement otherCls = checkDuplicate.get(wrapper);
-                if (otherCls != null) {
-                    log.error("The class [" + otherCls + "] and [" + actualCls + "] are \n" +
-                            "annotated with the same annotation [@SpdtActual(" +
-                            flavor + ")],\n" +
-                            "and they implement the same interface or inherit the same base class " +
-                            "@SpdtExpect [" + expect + "].\n" +
-                            "Each flavor can have only one implementation class.");
+                Set<TypeMirror> allFlavor = getActualFlavorClass(actualCls);
+                if (allFlavor.isEmpty()) {
+                    TypeMirrorWrapper wrapper = TypeMirrorWrapper.of(DefaultFlavor.class);
+                    TypeElement otherCls = checkDuplicate.get(wrapper);
+                    if (otherCls != null) {
+                        log.error("The class [" + otherCls + "] and [" + actualCls + "] are \n" +
+                                "annotated with the same annotation [@SpdtActual(DefaultFlavor.class)],\n" +
+                                "and they implement the same interface or inherit the same base class " +
+                                "@SpdtExpect [" + expect + "].\n" +
+                                "Each flavor can have only one implementation class.");
+                    } else {
+                        checkDuplicate.put(wrapper, actualCls);
+                    }
                 } else {
-                    checkDuplicate.put(wrapper, actualCls);
+                    for (TypeMirror f : allFlavor) {
+                        TypeMirrorWrapper wrapper = TypeMirrorWrapper.of(f);
+                        TypeElement otherCls = checkDuplicate.get(wrapper);
+                        if (otherCls != null) {
+                            log.error("The class [" + otherCls + "] and [" + actualCls + "] are \n" +
+                                    "annotated with the same annotation [@SpdtActual(" + f + ")],\n" +
+                                    "and they implement the same interface or inherit the same base class " +
+                                    "@SpdtExpect [" + expect + "].\n" +
+                                    "Each flavor can have only one implementation class.");
+                        } else {
+                            checkDuplicate.put(wrapper, actualCls);
+                        }
+                    }
                 }
             }
         }
@@ -191,36 +205,46 @@ public class ExpectProcessor implements IProcessor {
                                     "$T.currentFlavor().getClass()", SpdtFlavor.class, spdtCls)
                             .returns(expectClsName);
 
+            TypeElement defaultFlavor = null;
             for (TypeElement actualCls : entry.getValue()) {
-                TypeMirror flavor = getAnnotationParam(actualCls, SpdtActual.class, "value");
-                if (flavor == null) {
+                Set<TypeMirror> flavors = getActualFlavorClass(actualCls);
+                if (flavors == null || flavors.isEmpty()) {
+                    defaultFlavor = actualCls;
                     continue;
                 }
-                TypeName flavorName;
-                if (flavor instanceof Type.ErrorType) {
-                    String origin = flavor.toString();
-                    ClassName guessCls = ClassName.bestGuess(origin.substring(origin.indexOf(".") + 1));
-                    if (guessCls.packageName().isEmpty()) {
-                        flavorName = ClassName.get(env.packageName + ".annotation", guessCls.toString());
+                for (TypeMirror flavor : flavors) {
+                    TypeName flavorName;
+                    if (flavor instanceof Type.ErrorType) {
+                        String origin = flavor.toString();
+                        ClassName guessCls = ClassName.bestGuess(origin.substring(origin.indexOf(".") + 1));
+                        if (guessCls.packageName().isEmpty()) {
+                            flavorName = ClassName.get(env.packageName + ".annotation", guessCls.toString());
+                        } else {
+                            flavorName = guessCls;
+                        }
                     } else {
-                        flavorName = guessCls;
+                        flavorName = TypeName.get(flavor);
                     }
-                } else {
-                    flavorName = TypeName.get(flavor);
+                    createMethodBuilder.addCode(
+                            CodeBlock
+                                    .builder()
+                                    .beginControlFlow("if (flavorCls == $T.class)", flavorName)
+                                    .addStatement("return new $T()", actualCls)
+                                    .endControlFlow()
+                                    .build()
+                    );
                 }
-                createMethodBuilder.addCode(
-                        CodeBlock
-                                .builder()
-                                .beginControlFlow("if (flavorCls == $T.class)", flavorName)
-                                .addStatement("return new $T()", actualCls)
-                                .endControlFlow()
-                                .build()
-                );
             }
-
-            MethodSpec createMethod = createMethodBuilder
-                    .addStatement("return null")
-                    .build();
+            MethodSpec createMethod;
+            if (defaultFlavor != null) {
+                createMethod = createMethodBuilder
+                        .addStatement("return new $T()", defaultFlavor)
+                        .build();
+            } else {
+                createMethod = createMethodBuilder
+                        .addStatement("return null")
+                        .build();
+            }
 
             ParameterizedTypeName baseFactory = ParameterizedTypeName.get(factoryName, expectClsName);
             ClassName expectGuessName = ClassName.bestGuess(expectClsName.toString());
@@ -261,30 +285,51 @@ public class ExpectProcessor implements IProcessor {
         for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
                 : annotationMirror.getElementValues().entrySet()) {
             if (entry.getKey().getSimpleName().toString().equals(key)) {
+                //log.info("entry = " + entry + " key = " + key);
                 return entry.getValue();
             }
         }
         return null;
     }
 
-    @SuppressWarnings("SameParameterValue")
     @Nullable
-    private static TypeMirror getAnnotationParam(TypeElement clazz, Class<?> annotationCls, String key) {
+    private static List<TypeMirror> getAnnotationParam(TypeElement clazz, Class<?> annotationCls, String key) {
         AnnotationMirror anno = getAnnotationMirror(clazz, annotationCls);
         if (anno != null) {
-            //log.info("anno = " + anno + " " + anno.getElementValues() + " " + anno.getAnnotationType());
+            // log.info("anno = " + anno + " " + anno.getElementValues() + " " + anno.getAnnotationType());
             AnnotationValue param = getAnnotationValue(anno, key);
             if (param != null) {
+                // log.info("param = " + param + " " + param.getClass());
                 if (param instanceof UnresolvedClass) {
-                    // log.info("param = " + param + " " + ((UnresolvedClass) param).type +
-                    //         " " + ((UnresolvedClass) param).classType, true);
-                    return ((UnresolvedClass) param).classType;
+                    return Collections.<TypeMirror>singletonList(((UnresolvedClass) param).classType);
                 } else if (param instanceof Attribute.Class) {
-                    return ((Attribute.Class) param).getValue();
+                    return Collections.<TypeMirror>singletonList(((Attribute.Class) param).getValue());
+                } else if (param instanceof Attribute.Array) {
+                    List<TypeMirror> list = new ArrayList<>();
+                    List<Attribute> paramList = ((Attribute.Array) param).getValue();
+                    for (Attribute attr : paramList) {
+                        if (attr instanceof Attribute.Class) {
+                            list.add(((Attribute.Class) attr).getValue());
+                        }
+                    }
+                    return list;
                 }
             }
         }
         return null;
+    }
+
+    private Set<TypeMirror> getActualFlavorClass(TypeElement actualCls) {
+        List<TypeMirror> flavors = getAnnotationParam(actualCls, SpdtActual.class, "values");
+        List<TypeMirror> flavor = getAnnotationParam(actualCls, SpdtActual.class, "value");
+        Set<TypeMirror> allFlavor = new LinkedHashSet<>();
+        if (flavors != null) {
+            allFlavor.addAll(flavors);
+        }
+        if (flavor != null) {
+            allFlavor.addAll(flavor);
+        }
+        return allFlavor;
     }
 
     private static String dump(Map<TypeMirror, Set<TypeElement>> mapExpectToActual) {
@@ -317,8 +362,17 @@ public class ExpectProcessor implements IProcessor {
             actual = typeMirror;
         }
 
+        private TypeMirrorWrapper(String key) {
+            this.key = key;
+            actual = null;
+        }
+
         static TypeMirrorWrapper of(TypeMirror typeMirror) {
             return new TypeMirrorWrapper(typeMirror);
+        }
+
+        static TypeMirrorWrapper of(Class<?> type) {
+            return new TypeMirrorWrapper(type.getCanonicalName());
         }
 
         @Override

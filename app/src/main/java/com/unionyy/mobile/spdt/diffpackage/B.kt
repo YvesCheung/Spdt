@@ -13,3 +13,9 @@ class SpecialB : B {
 
     override fun print(): String = "SpecialB"
 }
+
+@SpdtActual
+class DefaultB : B {
+
+    override fun print(): String = "Default"
+}

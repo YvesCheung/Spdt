@@ -1,7 +1,5 @@
 package com.unionyy.mobile.plugin
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
 import com.google.gson.Gson
 import com.unionyy.mobile.spdt.data.SpdtConfigData
 import com.unionyy.mobile.spdt.data.SpdtFlavorData
@@ -12,7 +10,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.internal.reflect.DirectInstantiator
-import org.gradle.plugins.ide.eclipse.internal.AfterEvaluateHelper
 
 /**
  * Created by 张宇 on 2019/2/21.
@@ -23,7 +20,7 @@ class SpdtPlugin implements Plugin<Project> {
 
     private def initializer = DirectInstantiator.INSTANCE
 
-    private Namer<SpdtFlavorData> namer = new Namer<SpdtFlavorData>() {
+    private def namer = new Namer<SpdtFlavorData>() {
         @Override
         String determineName(SpdtFlavorData spdtFlavor) {
             return spdtFlavor.flavorName
