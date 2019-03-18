@@ -38,9 +38,4 @@ release {
     failOnUpdateNeeded = false
     buildTasks = []
     versionPropertyFile = "version.properties"
-
-    git {
-        requireBranch = 'master|*_maint'
-        pushToRemote = 'origin'
-    }
 }
