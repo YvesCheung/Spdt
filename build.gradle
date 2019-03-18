@@ -29,3 +29,17 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+apply plugin: 'net.researchgate.release'
+
+release {
+    failOnUnversionedFiles = false
+    failOnUpdateNeeded = false
+    buildTasks = []
+    versionPropertyFile = "version.properties"
+
+    git {
+        requireBranch = 'master|*_maint'
+        pushToRemote = 'origin'
+    }
+}
