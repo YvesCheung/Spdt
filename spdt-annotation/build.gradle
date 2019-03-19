@@ -27,6 +27,8 @@ task sourceJar (type:Jar) {
     from sourceSets.main.allSource
 }
 
+version = spdt_version
+
 publishing {
 
     publications {

@@ -35,6 +35,8 @@ dependencies {
 
 apply from: '../publish_java.gradle'
 
+version = spdt_version
+
 publishing {
 
     publications {
@@ -44,7 +46,7 @@ publishing {
             // Tell maven to prepare the generated "*.aar" file for publishing
             artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
             artifact androidSourcesJar
-            version = spdt_version
+            version = version
 
             pom.withXml {
                 //Creating additional node for dependencies
@@ -83,6 +85,6 @@ uploadArchives {
         repository(url: uri('../spdtRepo'))
         pom.groupId = 'com.unionyy.mobile'
         pom.artifactId = 'spdt-api'
-        pom.version = spdt_version
+        pom.version = version
     }
 }
