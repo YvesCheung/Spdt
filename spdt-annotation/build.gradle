@@ -22,6 +22,11 @@ dependencies {
 
 apply from: '../publish_java.gradle'
 
+task sourceJar (type:Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 publishing {
 
     publications {
@@ -30,7 +35,7 @@ publishing {
             artifactId 'spdt-annotation'
             // Tell maven to prepare the generated "*.aar" file for publishing
             artifact("$buildDir/libs/${project.getName()}-${version}.jar")
-            artifact androidSourcesJar
+            artifact sourceJar
 
             pom.withXml {
                 //Creating additional node for dependencies

@@ -18,6 +18,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            java {
+                include '**/*.java'
+                include '**/*.kt'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -36,6 +44,7 @@ publishing {
             // Tell maven to prepare the generated "*.aar" file for publishing
             artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
             artifact androidSourcesJar
+            version = spdt_version
 
             pom.withXml {
                 //Creating additional node for dependencies
@@ -74,6 +83,6 @@ uploadArchives {
         repository(url: uri('../spdtRepo'))
         pom.groupId = 'com.unionyy.mobile'
         pom.artifactId = 'spdt-api'
-        pom.version = version
+        pom.version = spdt_version
     }
 }
