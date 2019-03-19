@@ -37,5 +37,5 @@ release {
     failOnUnversionedFiles = false
     failOnUpdateNeeded = false
     buildTasks = []
-    versionPropertyFile = "version.properties"
+    versionPropertyFile = "gradle.properties"
 }
