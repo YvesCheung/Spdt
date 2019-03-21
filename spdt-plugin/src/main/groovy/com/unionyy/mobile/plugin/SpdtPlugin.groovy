@@ -36,15 +36,17 @@ class SpdtPlugin implements Plugin<Project> {
         def config = project.extensions.create(SpdtConfigContainer, "spdt", DefaultSpdtConfigContainer,
                 initializer, namer)
 
-        def file = project.file("spdt.tmp")
-        processAptParam(project, file)
+//        def file = project.file("spdt.tmp")
+//        processAptParam(project, file)
 
         project.afterEvaluate {
             if (!config.isEmpty()) {
                 checkConfig(config)
-                writeConfigToFile(config, file)
+                SpdtFlavorGenerator.apply(project, config)
+                //writeConfigToFile(config, file)
             }
         }
+
     }
 
     private static void addDependency(Project project) {

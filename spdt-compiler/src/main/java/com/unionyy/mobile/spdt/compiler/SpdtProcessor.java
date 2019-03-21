@@ -2,7 +2,6 @@ package com.unionyy.mobile.spdt.compiler;
 
 import com.google.auto.service.AutoService;
 import com.unionyy.mobile.spdt.compiler.expect.ExpectProcessor;
-import com.unionyy.mobile.spdt.compiler.flavor.FlavorProcessor;
 import com.unionyy.mobile.spdt.compiler.inject.InjectProcessor;
 
 import java.util.Arrays;
@@ -33,8 +32,8 @@ import javax.lang.model.element.TypeElement;
 @SupportedSourceVersion(SourceVersion.RELEASE_7)//java版本支持
 public class SpdtProcessor extends AbstractProcessor {
 
-    private List<IProcessor> processors = Arrays.asList(
-            new FlavorProcessor(),
+    private List<IProcessor> processors = Arrays.<IProcessor>asList(
+            //new FlavorProcessor(), //Use SpdtPlugin to generate the flavor class instead.
             new ExpectProcessor(),
             new InjectProcessor()
     );

@@ -100,7 +100,7 @@ public class InjectProcessor implements IProcessor {
                     .build();
 
             try {
-                JavaFile.builder(((Symbol.ClassSymbol) classElement).packge().toString(), injectCls).build().writeTo(filer);
+                JavaFile.builder(ClassName.get(classElement).packageName(), injectCls).build().writeTo(filer);
             } catch (IOException e) {
                 logger.warn(e.getMessage());
             }

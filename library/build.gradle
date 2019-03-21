@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'spdt'
 
@@ -22,17 +23,4 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-
-spdt {
-
-    LaotieFlavor {
-        appid = 'yym141and'
-    }
-
-    XiaoMiFlavor {
-        appid = 'yym139and'
-    }
-
-    current = LaotieFlavor
 }

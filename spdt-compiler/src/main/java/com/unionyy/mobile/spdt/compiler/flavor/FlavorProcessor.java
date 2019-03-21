@@ -30,6 +30,10 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
+/**
+ * @deprecated Use SpdtPlugin to generate the flavor class directly.
+ */
+@Deprecated
 public class FlavorProcessor implements IProcessor {
 
     @Override

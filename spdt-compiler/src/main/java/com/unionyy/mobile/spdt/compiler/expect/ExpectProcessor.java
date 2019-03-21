@@ -7,8 +7,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.sun.tools.javac.code.Attribute;
-import com.sun.tools.javac.code.Attribute.UnresolvedClass;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.ClassType;
 import com.unionyy.mobile.spdt.annotation.SpdtActual;
@@ -23,10 +21,8 @@ import com.unionyy.mobile.spdt.compiler.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,11 +31,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.MirroredTypesException;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
@@ -64,7 +59,6 @@ public class ExpectProcessor implements IProcessor {
     }
 
     private Map<TypeMirror, Set<TypeElement>> classifyActualClass(Set<TypeElement> actualClasses) {
-
         Map<TypeMirror, Set<TypeElement>> result = new LinkedHashMap<>();
         for (TypeElement actualCls : actualClasses) {
             List<? extends TypeMirror> interfaces = actualCls.getInterfaces();
@@ -128,32 +122,19 @@ public class ExpectProcessor implements IProcessor {
 
             Map<TypeMirrorWrapper, TypeElement> checkDuplicate = new LinkedHashMap<>();
             for (TypeElement actualCls : actuals) {
-                Set<TypeMirror> allFlavor = getActualFlavorClass(actualCls);
-                if (allFlavor.isEmpty()) {
-                    TypeMirrorWrapper wrapper = TypeMirrorWrapper.of(DefaultFlavor.class);
+                Set<TypeMirror> allFlavor = getAnnotationParam(actualCls);
+
+                for (TypeMirror f : allFlavor) {
+                    TypeMirrorWrapper wrapper = TypeMirrorWrapper.of(f);
                     TypeElement otherCls = checkDuplicate.get(wrapper);
                     if (otherCls != null) {
                         log.error("The class [" + otherCls + "] and [" + actualCls + "] are \n" +
-                                "annotated with the same annotation [@SpdtActual(DefaultFlavor.class)],\n" +
+                                "annotated with the same annotation [@SpdtActual(" + f + ")],\n" +
                                 "and they implement the same interface or inherit the same base class " +
                                 "@SpdtExpect [" + expect + "].\n" +
                                 "Each flavor can have only one implementation class.");
                     } else {
                         checkDuplicate.put(wrapper, actualCls);
-                    }
-                } else {
-                    for (TypeMirror f : allFlavor) {
-                        TypeMirrorWrapper wrapper = TypeMirrorWrapper.of(f);
-                        TypeElement otherCls = checkDuplicate.get(wrapper);
-                        if (otherCls != null) {
-                            log.error("The class [" + otherCls + "] and [" + actualCls + "] are \n" +
-                                    "annotated with the same annotation [@SpdtActual(" + f + ")],\n" +
-                                    "and they implement the same interface or inherit the same base class " +
-                                    "@SpdtExpect [" + expect + "].\n" +
-                                    "Each flavor can have only one implementation class.");
-                        } else {
-                            checkDuplicate.put(wrapper, actualCls);
-                        }
                     }
                 }
             }
@@ -207,10 +188,12 @@ public class ExpectProcessor implements IProcessor {
 
             TypeElement defaultFlavor = null;
             for (TypeElement actualCls : entry.getValue()) {
-                Set<TypeMirror> flavors = getActualFlavorClass(actualCls);
+                Set<TypeMirror> flavors = getAnnotationParam(actualCls);
                 if (flavors == null || flavors.isEmpty()) {
                     defaultFlavor = actualCls;
                     continue;
+                } else if (hasDefaultFlavor(flavors)) {
+                    defaultFlavor = actualCls;
                 }
                 for (TypeMirror flavor : flavors) {
                     TypeName flavorName;
@@ -271,63 +254,31 @@ public class ExpectProcessor implements IProcessor {
                 && "java.lang.Object".equals(obj.toString());
     }
 
-    private static AnnotationMirror getAnnotationMirror(TypeElement element, Class<?> clazz) {
-        String clazzName = clazz.getName();
-        for (AnnotationMirror m : element.getAnnotationMirrors()) {
-            if (clazzName.equals(m.getAnnotationType().toString())) {
-                return m;
+    private static boolean hasDefaultFlavor(Collection<TypeMirror> flavors) {
+        for (TypeMirror type : flavors) {
+            if (type.toString().equals(DefaultFlavor.class.getCanonicalName())) {
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
-    private static AnnotationValue getAnnotationValue(AnnotationMirror annotationMirror, String key) {
-        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
-                : annotationMirror.getElementValues().entrySet()) {
-            if (entry.getKey().getSimpleName().toString().equals(key)) {
-                //log.info("entry = " + entry + " key = " + key);
-                return entry.getValue();
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    private static List<TypeMirror> getAnnotationParam(TypeElement clazz, Class<?> annotationCls, String key) {
-        AnnotationMirror anno = getAnnotationMirror(clazz, annotationCls);
-        if (anno != null) {
-            // log.info("anno = " + anno + " " + anno.getElementValues() + " " + anno.getAnnotationType());
-            AnnotationValue param = getAnnotationValue(anno, key);
-            if (param != null) {
-                // log.info("param = " + param + " " + param.getClass());
-                if (param instanceof UnresolvedClass) {
-                    return Collections.<TypeMirror>singletonList(((UnresolvedClass) param).classType);
-                } else if (param instanceof Attribute.Class) {
-                    return Collections.<TypeMirror>singletonList(((Attribute.Class) param).getValue());
-                } else if (param instanceof Attribute.Array) {
-                    List<TypeMirror> list = new ArrayList<>();
-                    List<Attribute> paramList = ((Attribute.Array) param).getValue();
-                    for (Attribute attr : paramList) {
-                        if (attr instanceof Attribute.Class) {
-                            list.add(((Attribute.Class) attr).getValue());
-                        }
-                    }
-                    return list;
-                }
-            }
-        }
-        return null;
-    }
-
-    private Set<TypeMirror> getActualFlavorClass(TypeElement actualCls) {
-        List<TypeMirror> flavors = getAnnotationParam(actualCls, SpdtActual.class, "values");
-        List<TypeMirror> flavor = getAnnotationParam(actualCls, SpdtActual.class, "value");
+    private Set<TypeMirror> getAnnotationParam(TypeElement actualCls) {
         Set<TypeMirror> allFlavor = new LinkedHashSet<>();
-        if (flavors != null) {
-            allFlavor.addAll(flavors);
+        SpdtActual anno = actualCls.getAnnotation(SpdtActual.class);
+        try {
+            anno.values();
+        } catch (MirroredTypesException e) {
+            allFlavor.addAll(e.getTypeMirrors());
         }
-        if (flavor != null) {
-            allFlavor.addAll(flavor);
+        try {
+            anno.value();
+        } catch (MirroredTypeException e) {
+            TypeMirror type = e.getTypeMirror();
+            if (type != null &&
+                    !type.toString().equals(DefaultFlavor.class.getCanonicalName())) {
+                allFlavor.add(type);
+            }
         }
         return allFlavor;
     }
