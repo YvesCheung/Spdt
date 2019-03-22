@@ -1,7 +1,16 @@
 package com.unionyy.mobile.spdt
 
+import android.app.Application
+import android.os.Looper
 import android.util.LruCache
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor
+import com.unionyy.mobile.spdt.skin.SpdtSkinContext
+import com.unionyy.mobile.spdt.skin.SpdtSkinFactoryOption
+import com.unionyy.mobile.spdt.skin.SpdtSkinManager
+import com.unionyy.mobile.spdt.skin.SpdtSkinOption
+import com.unionyy.mobile.spdt.skin.factory.DefaultSkinFactory
+import com.unionyy.mobile.spdt.skin.factory.SpdtSkinFactory
+import java.util.*
 
 object Spdt {
 
@@ -13,7 +22,7 @@ object Spdt {
                 .getMethod("inject", obj.javaClass)
                 .invoke(null, obj)
         } catch (e: Exception) {
-            throw RuntimeException("Could not Spdt#inject the object '$obj' " +
+            throw SpdtException("Could not Spdt#inject the object '$obj' " +
                 "because '$injectCls' is invalid.", e)
         }
     }
@@ -25,12 +34,12 @@ object Spdt {
         return try {
             val factory: SpdtExpectToActualFactory<Spdt> = getOrNew(clsName) {
                 Class.forName(clsName).newInstance() as SpdtExpectToActualFactory<Spdt>
-            } ?: throw RuntimeException("The method getOrNew('$clsName') return null.")
+            } ?: throw SpdtException("The method getOrNew('$clsName') return null.")
 
             factory.create()
-                ?: throw RuntimeException("The create() method in '$clsName' return null.")
+                ?: throw SpdtException("The create() method in '$clsName' return null.")
         } catch (error: Exception) {
-            throw RuntimeException("Could not initialize the Spdt class '$spdtCls'", error)
+            throw SpdtException("Could not initialize the Spdt class '$spdtCls'", error)
         }
     }
 
@@ -66,6 +75,71 @@ object Spdt {
             }
         } else {
             factory as SpdtExpectToActualFactory<Spdt>
+        }
+    }
+
+    private var skinManager: SpdtSkinManager? = null
+
+    @JvmStatic
+    @JvmOverloads
+    fun applySkin(app: Application, option: ((SpdtSkinOption) -> Unit)? = null): SpdtSkinManager {
+        checkMainThread("applySkin")
+
+        val instance = skinManager
+        return if (instance == null) {
+            val ctxProducer = SpdtSkinOptionImpl(app)
+            option?.invoke(ctxProducer)
+            SpdtSkinManager(ctxProducer.produceContext()).also { skinManager = it }
+        } else {
+            instance
+        }
+    }
+
+    private fun checkMainThread(methodName: String) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            throw SpdtException("This method '$methodName' can only run in the UI thread.")
+        }
+    }
+
+    private class SpdtSkinOptionImpl(override val app: Application) : SpdtSkinOption {
+
+        private val factoryList = LinkedList<SpdtSkinFactory>().apply {
+            add(DefaultSkinFactory())
+        }
+
+        private val factoryManager = FactoryManager()
+
+        override fun factorys(option: (SpdtSkinFactoryOption) -> Unit) {
+            option(factoryManager)
+        }
+
+        override fun factorys(vararg factory: SpdtSkinFactory) {
+            factory.forEach(factoryManager::addLast)
+        }
+
+        override var allActivityEnable: Boolean = true
+
+        fun produceContext(): SpdtSkinContext =
+            SpdtSkinContext(app, factoryList.toList(), allActivityEnable)
+
+        private inner class FactoryManager : SpdtSkinFactoryOption {
+            private val checkDuplicate = mutableSetOf<SpdtSkinFactory>()
+
+            override fun addFirst(factory: SpdtSkinFactory) = checkDuplicate(factory) {
+                factoryList.addFirst(factory)
+            }
+
+            override fun addLast(factory: SpdtSkinFactory) = checkDuplicate(factory) {
+                factoryList.addLast(factory)
+            }
+
+            private inline fun checkDuplicate(factory: SpdtSkinFactory, isOk: () -> Unit) {
+                if (checkDuplicate.contains(factory)) {
+                    throw SpdtException("SpdtSkinFactory '$factory' can't be register twice!")
+                }
+                isOk()
+                checkDuplicate.add(factory)
+            }
         }
     }
 }

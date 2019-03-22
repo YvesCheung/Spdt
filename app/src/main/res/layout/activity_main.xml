@@ -11,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@color/colorPrimary"
         android:text="Hello World!"
         android:textColor="@color/helloworldtext" />
 
