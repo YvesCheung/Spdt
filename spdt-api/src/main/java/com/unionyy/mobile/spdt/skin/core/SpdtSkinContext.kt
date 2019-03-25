@@ -1,4 +1,4 @@
-package com.unionyy.mobile.spdt.skin
+package com.unionyy.mobile.spdt.skin.core
 
 import android.app.Application
 import com.unionyy.mobile.spdt.skin.factory.SpdtSkinFactory

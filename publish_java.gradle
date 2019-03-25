@@ -51,6 +51,13 @@ task androidSourcesJar(type: Jar) {
     }
 }
 
+task javaSourceJar(type: Jar) {
+    classifier = 'sources'
+    if (project.plugins.hasPlugin(JavaPlugin)) {
+        from sourceSets.main.java.srcDirs
+    }
+}
+
 task androidNativeJar(type: Jar) {
     classifier = 'so'
     from(new File(buildDir, 'libs'))

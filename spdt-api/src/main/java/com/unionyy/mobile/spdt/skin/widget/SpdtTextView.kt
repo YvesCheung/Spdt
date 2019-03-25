@@ -34,11 +34,11 @@ open class SpdtTextView : TextView {
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
         backgroundHelper = SpdtBackgroundHelper(this, attrs, defStyleAttr)
         backgroundHelper.loadAttributes()
-
     }
 
     override fun setBackgroundResource(resid: Int) {
         super.setBackgroundResource(resid)
         backgroundHelper.onSetBackgroundResource(resid)
     }
+
 }

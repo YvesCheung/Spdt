@@ -6,4 +6,5 @@ class DefaultFlavor private constructor() : SpdtFlavor {
 
     override val appid: String = "default"
 
+    override val resourceSuffix: String = ""
 }

@@ -1,4 +1,4 @@
-package com.unionyy.mobile.spdt.skin
+package com.unionyy.mobile.spdt.skin.factory
 
 import android.content.Context
 import android.util.AttributeSet

@@ -3,11 +3,7 @@ package com.unionyy.mobile.plugin
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
-import com.squareup.javapoet.ClassName
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.ParameterizedTypeName
-import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.*
 import com.unionyy.mobile.spdt.data.SpdtConfigData
 import com.unionyy.mobile.spdt.data.SpdtFlavorData
 import org.gradle.api.Project
@@ -81,9 +77,18 @@ class SpdtFlavorGenerator {
                     .addStatement('return $S', flavor.getAppid())
                     .build()
 
+            MethodSpec resourceSuffix = MethodSpec.methodBuilder("getResourceSuffix")
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(NotNull.class)
+                    .addAnnotation(Override.class)
+                    .returns(String.class)
+                    .addStatement('return $S', flavor.getResourceSuffix())
+                    .build()
+
             TypeSpec flavorCls = TypeSpec.classBuilder(flavor.getFlavorName())
                     .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
                     .addMethod(appid)
+                    .addMethod(resourceSuffix)
                     .addMethod(constructor)
                     .addSuperinterface(spdtFlavor)
                     .build()

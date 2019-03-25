@@ -1,4 +1,4 @@
-package com.unionyy.mobile.spdt.skin
+package com.unionyy.mobile.spdt.skin.core
 
 import android.app.Activity
 import android.app.Application
@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.view.LayoutInflaterCompat
 import android.view.LayoutInflater
 import com.unionyy.mobile.spdt.annotation.SpdtSkin
+import com.unionyy.mobile.spdt.skin.factory.SpdtFactoryDelegate
 
 /**
  * Created by 张宇 on 2019/3/22.

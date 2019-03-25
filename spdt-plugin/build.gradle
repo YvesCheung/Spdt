@@ -5,7 +5,7 @@ apply plugin: 'maven-publish'
 sourceSets {
     main {
         java {
-            include '**.groovy'
+            include '**/*.groovy'
         }
     }
 }
@@ -34,6 +34,7 @@ publishing {
             groupId 'com.unionyy.mobile'
             artifactId 'spdt'
             artifact("$buildDir/libs/${project.getName()}-${version}.jar")
+            artifact javaSourceJar
 
             pom.withXml {
                 //Creating additional node for dependencies

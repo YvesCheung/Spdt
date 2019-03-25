@@ -3,11 +3,7 @@ package com.unionyy.mobile.plugin
 import com.google.gson.Gson
 import com.unionyy.mobile.spdt.data.SpdtConfigData
 import com.unionyy.mobile.spdt.data.SpdtFlavorData
-import org.gradle.api.Action
-import org.gradle.api.GradleException
-import org.gradle.api.Namer
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import org.gradle.api.*
 import org.gradle.api.plugins.AppliedPlugin
 import org.gradle.internal.reflect.DirectInstantiator
 
@@ -102,21 +98,33 @@ class SpdtPlugin implements Plugin<Project> {
         }
 
         def reportJavaIdentifierError = {
-            throw new GradleException("The flavor name '$it' in 'spdt' config is not a " +
+            throw new GradleException("The $it in 'spdt' config is not a " +
                     "valid Java identifier.")
         }
 
         configs.each { SpdtFlavorData flavor ->
             def name = flavor.flavorName
+            if (name.isEmpty()) {
+                reportJavaIdentifierError("empty flavor name ''")
+            }
             for (int i : 0..name.size() - 1) {
                 char entry = name.charAt(i)
                 if (i == 0) {
                     if (!Character.isJavaIdentifierStart(entry)) {
-                        reportJavaIdentifierError(name)
+                        reportJavaIdentifierError("flavor name '$name'")
                     }
                 } else {
                     if (!Character.isJavaIdentifierPart(entry)) {
-                        reportJavaIdentifierError(name)
+                        reportJavaIdentifierError("flavor name '$name'")
+                    }
+                }
+            }
+
+            def suffix = flavor.resourceSuffix
+            if (suffix.size() > 0) {
+                for (int i : 0..suffix.size() - 1) {
+                    if (!Character.isJavaIdentifierPart(suffix.charAt(i))) {
+                        reportJavaIdentifierError("resourceSuffix '$suffix'")
                     }
                 }
             }

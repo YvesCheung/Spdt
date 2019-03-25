@@ -1,10 +1,11 @@
 package com.unionyy.mobile.spdt.skin.widget.attrs
 
 import android.support.annotation.DrawableRes
+import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.View
+import com.unionyy.mobile.spdt.Spdt
 import com.unionyy.mobile.spdt.api.R
-import com.unionyy.mobile.spdt.skin.R
 
 /**
  * Created by 张宇 on 2019/3/22.
@@ -28,5 +29,13 @@ class SpdtBackgroundHelper(
 
     fun onSetBackgroundResource(background: Int) {
         mBackground = background
+        applySkin()
+    }
+
+    override fun applySkin() {
+        if (mBackground != INVALID_ID) {
+            val drawable = Spdt.getDrawable(view.context, mBackground)
+            ViewCompat.setBackground(view, drawable)
+        }
     }
 }

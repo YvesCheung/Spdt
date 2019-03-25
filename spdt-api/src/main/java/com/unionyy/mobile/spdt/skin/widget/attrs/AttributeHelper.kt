@@ -5,6 +5,7 @@ import android.support.annotation.AttrRes
 import android.support.annotation.StyleableRes
 import android.util.AttributeSet
 import android.view.View
+import com.unionyy.mobile.spdt.skin.Skinable
 
 /**
  * Created by 张宇 on 2019/3/22.
@@ -15,7 +16,7 @@ abstract class AttributeHelper(
     protected val view: View,
     protected val attrs: AttributeSet?,
     @AttrRes protected val defStyleAttr: Int
-) {
+) : Skinable {
 
     companion object {
         const val INVALID_ID = 0
@@ -24,6 +25,7 @@ abstract class AttributeHelper(
     fun loadAttributes() {
         if (attrs != null) {
             onLoadAttributes()
+            applySkin()
         }
     }
 

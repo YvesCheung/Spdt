@@ -17,6 +17,15 @@ tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
+sourceSets {
+    main {
+        java {
+            include '**/*.java'
+            include '**/*.kt'
+        }
+    }
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     compile "com.google.code.gson:gson:${gson_version}"
@@ -32,7 +41,7 @@ publishing {
             artifactId 'spdt-data'
             // Tell maven to prepare the generated "*.aar" file for publishing
             artifact("$buildDir/libs/${project.getName()}-${version}.jar")
-            artifact androidSourcesJar
+            artifact javaSourceJar
 
             pom.withXml {
                 //Creating additional node for dependencies

@@ -4,4 +4,6 @@ package com.unionyy.mobile.spdt.annotation
 interface SpdtFlavor {
 
     val appid: String
+
+    val resourceSuffix: String
 }
