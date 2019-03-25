@@ -1,13 +1,12 @@
 package com.unionyy.mobile.spdt.skin.widget
 
-import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.widget.TextView
 import com.unionyy.mobile.spdt.skin.widget.attrs.SpdtBackgroundHelper
-import android.arch.lifecycle.ViewModelProviders
+
 /**
  * Created by 张宇 on 2019/3/22.
  * E-mail: zhangyu4@yy.com
@@ -38,5 +37,8 @@ open class SpdtTextView : TextView {
 
     }
 
-
+    override fun setBackgroundResource(resid: Int) {
+        super.setBackgroundResource(resid)
+        backgroundHelper.onSetBackgroundResource(resid)
+    }
 }

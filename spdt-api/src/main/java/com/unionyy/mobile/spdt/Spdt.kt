@@ -2,6 +2,7 @@ package com.unionyy.mobile.spdt
 
 import android.app.Application
 import android.os.Looper
+import android.util.Log
 import android.util.LruCache
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor
 import com.unionyy.mobile.spdt.skin.SpdtSkinContext
@@ -10,6 +11,7 @@ import com.unionyy.mobile.spdt.skin.SpdtSkinManager
 import com.unionyy.mobile.spdt.skin.SpdtSkinOption
 import com.unionyy.mobile.spdt.skin.factory.DefaultSkinFactory
 import com.unionyy.mobile.spdt.skin.factory.SpdtSkinFactory
+import com.unionyy.mobile.spdt.skin.log.SpdtLog
 import java.util.*
 
 object Spdt {
@@ -119,8 +121,22 @@ object Spdt {
 
         override var allActivityEnable: Boolean = true
 
+        override var logger: SpdtLog = object : SpdtLog {
+            override fun info(tag: String, msg: Any?) {
+                Log.i(tag, msg?.toString())
+            }
+
+            override fun error(tag: String, msg: Any?) {
+                Log.e(tag, msg?.toString())
+            }
+
+            override fun debug(tag: String, msg: Any?) {
+                Log.d(tag, msg?.toString())
+            }
+        }
+
         fun produceContext(): SpdtSkinContext =
-            SpdtSkinContext(app, factoryList.toList(), allActivityEnable)
+            SpdtSkinContext(app, factoryList.toList(), allActivityEnable, logger)
 
         private inner class FactoryManager : SpdtSkinFactoryOption {
             private val checkDuplicate = mutableSetOf<SpdtSkinFactory>()

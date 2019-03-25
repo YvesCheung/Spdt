@@ -3,6 +3,7 @@ package com.unionyy.mobile.spdt.skin.widget.attrs
 import android.support.annotation.DrawableRes
 import android.util.AttributeSet
 import android.view.View
+import com.unionyy.mobile.spdt.api.R
 import com.unionyy.mobile.spdt.skin.R
 
 /**
