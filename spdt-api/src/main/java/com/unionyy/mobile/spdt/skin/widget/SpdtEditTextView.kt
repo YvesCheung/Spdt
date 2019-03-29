@@ -4,43 +4,31 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
-import android.widget.TextView
+import android.widget.EditText
 import com.unionyy.mobile.spdt.skin.widget.attrs.SpdtBackgroundHelper
 import com.unionyy.mobile.spdt.skin.widget.attrs.SpdtTextAttrsHelper
 
-/**
- * Created by 张宇 on 2019/3/22.
- * E-mail: zhangyu4@yy.com
- * YY: 909017428
- */
-open class SpdtTextView : TextView {
+class SpdtEditTextView : EditText {
 
     constructor(context: Context) : this(context, null)
 
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-        super(context, attrs, defStyleAttr) {
-        init(context, attrs, defStyleAttr)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-        super(context, attrs, defStyleAttr, defStyleRes) {
+            super(context, attrs, defStyleAttr) {
         init(context, attrs, defStyleAttr)
     }
 
     private lateinit var backgroundHelper: SpdtBackgroundHelper
-    private lateinit var textAttrHelper: SpdtTextAttrsHelper
+    private lateinit var textAttrsHelper: SpdtTextAttrsHelper
 
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
         backgroundHelper = SpdtBackgroundHelper(this, attrs, defStyleAttr)
+        textAttrsHelper = SpdtTextAttrsHelper(this, attrs, defStyleAttr)
         backgroundHelper.loadAttributes()
-        textAttrHelper = SpdtTextAttrsHelper(this, attrs, defStyleAttr)
-        textAttrHelper.loadAttributes()
+        textAttrsHelper.loadAttributes()
     }
 
-    //其实没太去看为什么要选择这些方法复写
     override fun setBackgroundResource(resid: Int) {
         super.setBackgroundResource(resid)
         backgroundHelper.onSetBackgroundResource(resid)
@@ -52,16 +40,16 @@ open class SpdtTextView : TextView {
 
     override fun setTextAppearance(context: Context?, resId: Int) {
         super.setTextAppearance(context, resId)
-        textAttrHelper.onSetTextAttrsResource(resId)
+        textAttrsHelper.onSetTextAttrsResource(resId)
     }
 
     override fun setCompoundDrawablesRelativeWithIntrinsicBounds(start: Int, top: Int, end: Int, bottom: Int) {
         super.setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom)
-        textAttrHelper.onSetCompundDrawableWithInstrinsicBounds(start, top, end, bottom)
+        textAttrsHelper.onSetCompundDrawableWithInstrinsicBounds(start, top, end, bottom)
     }
 
     override fun setCompoundDrawablesWithIntrinsicBounds(left: Int, top: Int, right: Int, bottom: Int) {
         super.setCompoundDrawablesWithIntrinsicBounds(left, top, right, bottom)
-        textAttrHelper.onSetCompundDrawableWithInstrinsicBounds(left, top, right, bottom)
+        textAttrsHelper.onSetCompundDrawableWithInstrinsicBounds(left, top, right, bottom)
     }
 }

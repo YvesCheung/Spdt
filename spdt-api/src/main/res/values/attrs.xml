@@ -8,7 +8,7 @@
         <attr name="android:src" />
     </declare-styleable>
 
-    <declare-styleable name="SpdtTextHelper">
+    <declare-styleable name="SpdtTextAttrsHelper">
         <attr name="android:drawableLeft" />
         <attr name="android:drawableTop" />
         <attr name="android:drawableRight" />
@@ -29,5 +29,9 @@
         <attr name="android:shadowDy" />
         <attr name="android:shadowDx" />
         <attr name="android:shadowRadius" />
+    </declare-styleable>
+    <declare-styleable name="SpdtProgressBar">
+        <attr name="android:indeterminateDrawable" />
+        <attr name="android:progressDrawable" />
     </declare-styleable>
 </resources>
