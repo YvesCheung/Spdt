@@ -47,7 +47,7 @@ class SpdtPlugin implements Plugin<Project> {
 
     private static void addDependency(Project project) {
 
-        def version = "2.0.1-SNAPSHOT"
+        def version = "2.0.2-SNAPSHOT"
 
         def getDepend = { String module ->
             def moduleProject = project.findProject(":$module")
@@ -61,7 +61,7 @@ class SpdtPlugin implements Plugin<Project> {
         def addSpdtDependency = new Action<AppliedPlugin>() {
             @Override
             void execute(AppliedPlugin appliedPlugin) {
-                project.dependencies.add("implementation", getDepend("spdt-api"))
+                project.dependencies.add("api", getDepend("spdt-api"))
                 project.dependencies.add("implementation", getDepend("spdt-annotation"))
             }
         }
