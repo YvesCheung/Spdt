@@ -16,13 +16,13 @@ open class SpdtButton : Button {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-            super(context, attrs, defStyleAttr) {
+        super(context, attrs, defStyleAttr) {
         init(context, attrs, defStyleAttr)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-            super(context, attrs, defStyleAttr, defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes) {
         init(context, attrs, defStyleAttr)
     }
 

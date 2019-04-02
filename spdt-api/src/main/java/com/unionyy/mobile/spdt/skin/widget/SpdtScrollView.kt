@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.widget.ScrollView
 import com.unionyy.mobile.spdt.skin.widget.attrs.SpdtBackgroundHelper
 
-class SpdtScrollView : ScrollView {
+open class SpdtScrollView : ScrollView {
 
     constructor(context: Context) : this(context, null)
 

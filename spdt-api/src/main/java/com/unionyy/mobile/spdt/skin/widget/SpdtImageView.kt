@@ -1,8 +1,6 @@
 package com.unionyy.mobile.spdt.skin.widget
 
 import android.content.Context
-import android.os.Build
-import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.widget.ImageView
 import com.unionyy.mobile.spdt.skin.widget.attrs.SpdtBackgroundHelper
@@ -15,7 +13,7 @@ open class SpdtImageView : ImageView {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-            super(context, attrs, defStyleAttr) {
+        super(context, attrs, defStyleAttr) {
         init(context, attrs, defStyleAttr)
     }
 
