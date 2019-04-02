@@ -119,4 +119,10 @@ internal class SpdtSkinClient : SkinClient {
             ?: throw SpdtException("Can't use 'Spdt#getColor' without 'Spdt#applySkin'.")
         return actual.getColor(context, resId)
     }
+
+    override fun getString(context: Context, resId: Int): String {
+        val actual = skinManager
+            ?: throw SpdtException("Can't use 'Spdt#getString' without 'Spdt#applySkin'.")
+        return actual.getString(context, resId)
+    }
 }

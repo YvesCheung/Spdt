@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
+import android.support.annotation.StringRes
 
 /**
  * Created by 张宇 on 2019/3/25.
@@ -18,4 +19,6 @@ interface SkinResource {
     fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList
 
     fun getColor(context: Context, @ColorRes resId: Int): Int
+
+    fun getString(context: Context, @StringRes resId: Int): String
 }

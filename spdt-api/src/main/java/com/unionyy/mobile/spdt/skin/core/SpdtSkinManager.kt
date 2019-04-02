@@ -49,6 +49,15 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
         return context.resources.getColor(resId)
     }
 
+    override fun getString(context: Context, resId: Int): String {
+        val hookResId = getTargetResId(context, resId)
+        if (hookResId != invalidID) {
+            return context.resources.getString(hookResId)
+        }
+
+        return context.resources.getString(resId)
+    }
+
     private fun getTargetResId(context: Context, resId: Int): Int {
         return try {
             val resName = context.resources.getResourceEntryName(resId) +
