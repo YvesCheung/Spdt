@@ -51,5 +51,5 @@ spdt {
         resourceSuffix = "_mi"
     }
 
-    current = XiaoMiFlavor
+    current = LaotieFlavor
 }
