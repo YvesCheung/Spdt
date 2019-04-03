@@ -28,7 +28,7 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
             return context.resources.getDrawable(hookResId)
         }
 
-        return context.resources.getDrawable(resId)
+        return spdtCtx.app.resources.getDrawable(resId)
     }
 
     override fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList {
@@ -37,7 +37,7 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
             return context.resources.getColorStateList(hookResId)
         }
 
-        return context.resources.getColorStateList(resId)
+        return spdtCtx.app.resources.getColorStateList(resId)
     }
 
     override fun getColor(context: Context, @ColorRes resId: Int): Int {
@@ -46,7 +46,7 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
             return context.resources.getColor(hookResId)
         }
 
-        return context.resources.getColor(resId)
+        return spdtCtx.app.resources.getColor(resId)
     }
 
     override fun getString(context: Context, resId: Int): String {
@@ -55,7 +55,7 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
             return context.resources.getString(hookResId)
         }
 
-        return context.resources.getString(resId)
+        return spdtCtx.app.resources.getString(resId)
     }
 
     private fun getTargetResId(context: Context, resId: Int): Int {

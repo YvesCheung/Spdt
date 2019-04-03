@@ -1,5 +1,10 @@
 package com.unionyy.mobile.spdt
 
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
+import android.support.annotation.StringRes
 import android.util.LruCache
 import com.unionyy.mobile.spdt.annotation.SpdtFlavor
 import com.unionyy.mobile.spdt.skin.SkinClient
@@ -70,6 +75,21 @@ object Spdt : SkinClient by SpdtSkinClient() {
             }
         } else {
             factory as SpdtExpectToActualFactory<Spdt>
+        }
+    }
+
+    @JvmStatic
+    fun drawable(context: Context, @DrawableRes resId: Int): Drawable = getDrawable(context, resId)
+
+    @JvmStatic
+    fun color(context: Context, @ColorRes resId: Int): Int = getColor(context, resId)
+
+    @JvmStatic
+    fun string(context: Context, @StringRes resId: Int, vararg arg: Any): String {
+        return if (arg.isEmpty()) {
+            getString(context, resId)
+        } else {
+            String.format(getString(context, resId), *arg)
         }
     }
 }
