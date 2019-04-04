@@ -1,21 +1,18 @@
 package com.unionyy.mobile.spdt.skin.widget.attrs
 
-import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.support.annotation.AttrRes
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import android.util.AttributeSet
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import com.unionyy.mobile.spdt.Spdt
 import com.unionyy.mobile.spdt.api.R
 
 class SpdtTextAttrsHelper(
-        view: TextView,
-        attrs: AttributeSet?,
-        defStyleAttr: Int
+    view: TextView,
+    attrs: AttributeSet?,
+    defStyleAttr: Int
 ) : AttributeHelper(view, attrs, defStyleAttr) {
 
     //有多少个属性是有必要支持换肤的
@@ -34,6 +31,8 @@ class SpdtTextAttrsHelper(
         loadAttributes(R.styleable.SpdtTextAppearance) {
             mTextColor = getResourceId(R.styleable.SpdtTextAppearance_android_textColor, INVALID_ID)
             mTextColorHint = getResourceId(R.styleable.SpdtTextAppearance_android_textColorHint, INVALID_ID)
+        }
+        loadAttributes(R.styleable.SpdtTextAttrsHelper) {
             mDrawableLeft = getResourceId(R.styleable.SpdtTextAttrsHelper_android_drawableLeft, INVALID_ID)
             mDrawableRight = getResourceId(R.styleable.SpdtTextAttrsHelper_android_drawableRight, INVALID_ID)
             mDrawableTop = getResourceId(R.styleable.SpdtTextAttrsHelper_android_drawableTop, INVALID_ID)
@@ -58,10 +57,11 @@ class SpdtTextAttrsHelper(
     }
 
     fun onSetCompundDrawableWithInstrinsicBounds(
-            @DrawableRes left: Int,
-            @DrawableRes top: Int,
-            @DrawableRes right: Int,
-            @DrawableRes bottom: Int) {
+        @DrawableRes left: Int,
+        @DrawableRes top: Int,
+        @DrawableRes right: Int,
+        @DrawableRes bottom: Int
+    ) {
         mDrawableLeft = left
         mDrawableRight = right
         mDrawableTop = top
@@ -119,14 +119,14 @@ class SpdtTextAttrsHelper(
             drawableBottom = Spdt.getDrawable(view.context, mDrawaleBottom)
         }
         if (mDrawableLeft != INVALID_ID
-                || mDrawableRight != INVALID_ID
-                || mDrawableTop != INVALID_ID
-                || mDrawaleBottom != INVALID_ID) {
+            || mDrawableRight != INVALID_ID
+            || mDrawableTop != INVALID_ID
+            || mDrawaleBottom != INVALID_ID) {
             (view as TextView).setCompoundDrawablesWithIntrinsicBounds(
-                    drawableLeft,
-                    drawableTop,
-                    drawableRight,
-                    drawableBottom
+                drawableLeft,
+                drawableTop,
+                drawableRight,
+                drawableBottom
             )
         }
     }
