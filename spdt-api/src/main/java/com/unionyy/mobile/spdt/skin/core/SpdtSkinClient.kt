@@ -102,27 +102,33 @@ internal class SpdtSkinClient : SkinClient {
         }
     }
 
-    override fun getDrawable(context: Context, resId: Int): Drawable {
-        val actual = skinManager
-            ?: throw SpdtException("Can't use 'Spdt#getDrawable' without 'Spdt#applySkin'.")
-        return actual.getDrawable(context, resId)
-    }
+    override fun getDrawable(context: Context, resId: Int): Drawable =
+        delegate("getDrawable") { getDrawable(context, resId) }
 
-    override fun getColorStateList(context: Context, resId: Int): ColorStateList {
-        val actual = skinManager
-            ?: throw SpdtException("Can't use 'Spdt#getColorStateList' without 'Spdt#applySkin'.")
-        return actual.getColorStateList(context, resId)
-    }
+    override fun getDrawable(resId: Int): Drawable =
+        delegate("getDrawable") { getDrawable(resId) }
 
-    override fun getColor(context: Context, resId: Int): Int {
-        val actual = skinManager
-            ?: throw SpdtException("Can't use 'Spdt#getColor' without 'Spdt#applySkin'.")
-        return actual.getColor(context, resId)
-    }
+    override fun getColorStateList(context: Context, resId: Int): ColorStateList =
+        delegate("getColorStateList") { getColorStateList(context, resId) }
 
-    override fun getString(context: Context, resId: Int): String {
+    override fun getColorStateList(resId: Int): ColorStateList =
+        delegate("getColorStateList") { getColorStateList(resId) }
+
+    override fun getColor(context: Context, resId: Int): Int =
+        delegate("getColor") { getColor(context, resId) }
+
+    override fun getColor(resId: Int): Int =
+        delegate("getColor") { getColor(resId) }
+
+    override fun getString(context: Context, resId: Int): String =
+        delegate("getString") { getString(context, resId) }
+
+    override fun getString(resId: Int): String =
+        delegate("getString") { getString(resId) }
+
+    private inline fun <T> delegate(methodName: String, doActual: SpdtSkinManager.() -> T): T {
         val actual = skinManager
-            ?: throw SpdtException("Can't use 'Spdt#getString' without 'Spdt#applySkin'.")
-        return actual.getString(context, resId)
+            ?: throw SpdtException("Can't use 'Spdt#$methodName' without 'Spdt#applySkin'.")
+        return doActual(actual)
     }
 }

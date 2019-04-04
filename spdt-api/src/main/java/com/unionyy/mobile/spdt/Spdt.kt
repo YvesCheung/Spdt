@@ -1,6 +1,5 @@
 package com.unionyy.mobile.spdt
 
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
@@ -79,17 +78,17 @@ object Spdt : SkinClient by SpdtSkinClient() {
     }
 
     @JvmStatic
-    fun drawable(context: Context, @DrawableRes resId: Int): Drawable = getDrawable(context, resId)
+    fun drawable(@DrawableRes resId: Int): Drawable = getDrawable(resId)
 
     @JvmStatic
-    fun color(context: Context, @ColorRes resId: Int): Int = getColor(context, resId)
+    fun color(@ColorRes resId: Int): Int = getColor(resId)
 
     @JvmStatic
-    fun string(context: Context, @StringRes resId: Int, vararg arg: Any): String {
+    fun string(@StringRes resId: Int, vararg arg: Any): String {
         return if (arg.isEmpty()) {
-            getString(context, resId)
+            getString(resId)
         } else {
-            String.format(getString(context, resId), *arg)
+            String.format(getString(resId), *arg)
         }
     }
 }

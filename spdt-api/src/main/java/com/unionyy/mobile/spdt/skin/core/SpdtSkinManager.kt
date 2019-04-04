@@ -21,6 +21,8 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
         SkinLifecycle.install(spdtCtx)
     }
 
+    override fun getDrawable(resId: Int): Drawable = getDrawable(spdtCtx.app, resId)
+
     override fun getDrawable(context: Context, @DrawableRes resId: Int): Drawable {
 
         val hookResId = getTargetResId(context, resId)
@@ -31,6 +33,9 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
         return spdtCtx.app.resources.getDrawable(resId)
     }
 
+    override fun getColorStateList(resId: Int): ColorStateList =
+        getColorStateList(spdtCtx.app, resId)
+
     override fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList {
         val hookResId = getTargetResId(context, resId)
         if (hookResId != invalidID) {
@@ -40,6 +45,8 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
         return spdtCtx.app.resources.getColorStateList(resId)
     }
 
+    override fun getColor(resId: Int): Int = getColor(spdtCtx.app, resId)
+
     override fun getColor(context: Context, @ColorRes resId: Int): Int {
         val hookResId = getTargetResId(context, resId)
         if (hookResId != invalidID) {
@@ -48,6 +55,8 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
 
         return spdtCtx.app.resources.getColor(resId)
     }
+
+    override fun getString(resId: Int): String = getString(spdtCtx.app, resId)
 
     override fun getString(context: Context, resId: Int): String {
         val hookResId = getTargetResId(context, resId)

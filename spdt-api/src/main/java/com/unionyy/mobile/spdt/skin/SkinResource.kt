@@ -16,9 +16,17 @@ interface SkinResource {
 
     fun getDrawable(context: Context, @DrawableRes resId: Int): Drawable
 
+    fun getDrawable(@DrawableRes resId: Int): Drawable
+
     fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList
+
+    fun getColorStateList(@ColorRes resId: Int): ColorStateList
 
     fun getColor(context: Context, @ColorRes resId: Int): Int
 
+    fun getColor(@ColorRes resId: Int): Int
+
     fun getString(context: Context, @StringRes resId: Int): String
+
+    fun getString(@StringRes resId: Int): String
 }
