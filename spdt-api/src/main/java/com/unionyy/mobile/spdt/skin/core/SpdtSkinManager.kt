@@ -57,7 +57,7 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
         if (hookRes.resId != invalidID) {
             val hookResEntry = getResEntry(context.resources, hookRes.resId)
             spdtCtx.logger.debug("SpdtSkin",
-                "hook resource: resName = ${hookRes.resName} " +
+                "hook resource: resName = ${hookRes.hookResName} " +
                     "type = ${hookRes.resType} " +
                     "resId = ${hookRes.resId} " +
                     "entry = ${toHexIfNumber(hookResEntry)}")
@@ -82,16 +82,21 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
 
     private fun getTargetResId(context: Context, resId: Int): ResId {
         return try {
-            val resName = context.resources.getResourceEntryName(resId) +
-                Spdt.currentFlavor().resourceSuffix
+            val resName = context.resources.getResourceEntryName(resId)
+            val hookName = resName + Spdt.currentFlavor().resourceSuffix
             val type = context.resources.getResourceTypeName(resId)
-            val identifier = context.resources.getIdentifier(resName, type, context.packageName)
-            ResId(resName, type, identifier)
+            val identifier = context.resources.getIdentifier(hookName, type, context.packageName)
+            ResId(identifier, resName, hookName, type)
         } catch (e: Exception) {
             // 换肤失败不至于应用崩溃.
-            ResId("", "", invalidID)
+            ResId(invalidID, "", "", "")
         }
     }
 
-    private data class ResId(val resName: String, val resType: String, @AnyRes val resId: Int)
+    private data class ResId(
+        @AnyRes val resId: Int,
+        val resName: String,
+        val hookResName: String,
+        val resType: String
+    )
 }
