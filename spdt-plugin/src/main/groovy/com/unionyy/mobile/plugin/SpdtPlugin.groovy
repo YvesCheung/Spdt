@@ -47,7 +47,7 @@ class SpdtPlugin implements Plugin<Project> {
 
     private static void addDependency(Project project) {
 
-        def version = "2.0.4-SNAPSHOT"
+        def version = "2.0.5-SNAPSHOT"
 
         def getDepend = { String module ->
             def moduleProject = project.findProject(":$module")

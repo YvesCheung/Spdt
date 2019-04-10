@@ -2,7 +2,9 @@ package com.unionyy.mobile.spdt.skin.core
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.support.annotation.AnyRes
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import com.unionyy.mobile.spdt.Spdt
@@ -23,64 +25,67 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
 
     override fun getDrawable(resId: Int): Drawable = getDrawable(spdtCtx.app, resId)
 
-    override fun getDrawable(context: Context, @DrawableRes resId: Int): Drawable {
-
-        val hookResId = getTargetResId(context, resId)
-        if (hookResId != invalidID) {
-            return context.resources.getDrawable(hookResId)
+    override fun getDrawable(context: Context, @DrawableRes resId: Int): Drawable =
+        swapResId(context, resId) { id ->
+            getDrawable(id)
         }
-
-        return spdtCtx.app.resources.getDrawable(resId)
-    }
 
     override fun getColorStateList(resId: Int): ColorStateList =
         getColorStateList(spdtCtx.app, resId)
 
-    override fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList {
-        val hookResId = getTargetResId(context, resId)
-        if (hookResId != invalidID) {
-            return context.resources.getColorStateList(hookResId)
+    override fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList =
+        swapResId(context, resId) { id ->
+            getColorStateList(id)
         }
-
-        return spdtCtx.app.resources.getColorStateList(resId)
-    }
 
     override fun getColor(resId: Int): Int = getColor(spdtCtx.app, resId)
 
-    override fun getColor(context: Context, @ColorRes resId: Int): Int {
-        val hookResId = getTargetResId(context, resId)
-        if (hookResId != invalidID) {
-            return context.resources.getColor(hookResId)
+    override fun getColor(context: Context, @ColorRes resId: Int): Int =
+        swapResId(context, resId) { id ->
+            getColor(id)
         }
-
-        return spdtCtx.app.resources.getColor(resId)
-    }
 
     override fun getString(resId: Int): String = getString(spdtCtx.app, resId)
 
-    override fun getString(context: Context, resId: Int): String {
-        val hookResId = getTargetResId(context, resId)
-        if (hookResId != invalidID) {
-            return context.resources.getString(hookResId)
+    override fun getString(context: Context, resId: Int): String =
+        swapResId(context, resId) { id ->
+            getString(id)
         }
 
-        return spdtCtx.app.resources.getString(resId)
+    private inline fun <T : Any> swapResId(context: Context, resId: Int, getResEntry: Resources.(resId: Int) -> T): T {
+
+        val hookRes = getTargetResId(context, resId)
+        if (hookRes.resId != invalidID) {
+            val hookResEntry = getResEntry(context.resources, hookRes.resId)
+            spdtCtx.logger.debug("SpdtSkin",
+                "hook resource: resName = ${hookRes.resName} " +
+                    "type = ${hookRes.resType} " +
+                    "resId = ${hookRes.resId} " +
+                    "entry = $hookResEntry")
+            return hookResEntry
+        } else {
+            val originResEntry = getResEntry(context.resources, resId)
+            spdtCtx.logger.debug("SpdtSkin",
+                "origin resource: resName = ${hookRes.resName} " +
+                    "type = ${hookRes.resType} " +
+                    "resId = ${hookRes.resId} " +
+                    "entry = $originResEntry")
+            return originResEntry
+        }
     }
 
-    private fun getTargetResId(context: Context, resId: Int): Int {
+    private fun getTargetResId(context: Context, resId: Int): ResId {
         return try {
             val resName = context.resources.getResourceEntryName(resId) +
                 Spdt.currentFlavor().resourceSuffix
             val type = context.resources.getResourceTypeName(resId)
             val identifier = context.resources.getIdentifier(resName, type, context.packageName)
-            spdtCtx.logger.debug("SpdtSkin",
-                "resName = $resName " +
-                    "type = $type " +
-                    "resId = $identifier")
-            identifier
+            ResId(resName, type, identifier)
         } catch (e: Exception) {
             // 换肤失败不至于应用崩溃.
-            invalidID
+            ResId("", "", invalidID)
         }
     }
+
+    private data class ResId(val resName: String, val resType: String, @AnyRes val resId: Int)
 }
