@@ -53,7 +53,6 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
         }
 
     private inline fun <T : Any> swapResId(context: Context, resId: Int, getResEntry: Resources.(resId: Int) -> T): T {
-
         val hookRes = getTargetResId(context, resId)
         if (hookRes.resId != invalidID) {
             val hookResEntry = getResEntry(context.resources, hookRes.resId)
@@ -61,18 +60,25 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
                 "hook resource: resName = ${hookRes.resName} " +
                     "type = ${hookRes.resType} " +
                     "resId = ${hookRes.resId} " +
-                    "entry = $hookResEntry")
+                    "entry = ${toHexIfNumber(hookResEntry)}")
             return hookResEntry
         } else {
             val originResEntry = getResEntry(context.resources, resId)
             spdtCtx.logger.debug("SpdtSkin",
                 "origin resource: resName = ${hookRes.resName} " +
                     "type = ${hookRes.resType} " +
-                    "resId = ${hookRes.resId} " +
-                    "entry = $originResEntry")
+                    "resId = $resId " +
+                    "entry = ${toHexIfNumber(originResEntry)}")
             return originResEntry
         }
     }
+
+    private fun <T : Any> toHexIfNumber(any: T): String =
+        if (any is Int) {
+            Integer.toHexString(any)
+        } else {
+            any.toString()
+        }
 
     private fun getTargetResId(context: Context, resId: Int): ResId {
         return try {
