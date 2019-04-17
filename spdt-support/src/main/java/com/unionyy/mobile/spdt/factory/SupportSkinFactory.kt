@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.unionyy.mobile.spdt.skin.factory.DefaultSkinFactory
 import com.unionyy.mobile.spdt.skin.factory.SpdtSkinFactory
+import com.unionyy.mobile.spdt.widget.SpdtConstrainLayout
 import com.unionyy.mobile.spdt.widget.SpdtSupportButton
 import com.unionyy.mobile.spdt.widget.SpdtSupportEditText
 import com.unionyy.mobile.spdt.widget.SpdtSupportImageView
@@ -23,6 +24,7 @@ class SupportSkinFactory : SpdtSkinFactory {
             "AppCompatButton" -> SpdtSupportButton(context, attrs)
             "AppCompatEditText" -> SpdtSupportEditText(context, attrs)
             "AppCompatImageView" -> SpdtSupportImageView(context, attrs)
+            "ConstraintLayout" -> SpdtConstrainLayout(context, attrs)
             else -> null
         }
     }
