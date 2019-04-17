@@ -15,7 +15,7 @@ import com.unionyy.mobile.spdt.skin.SkinResource
  * E-mail: zhangyu4@yy.com
  * YY: 909017428
  */
-class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
+open class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
 
     private val invalidID = 0
 
@@ -80,7 +80,7 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
             any.toString()
         }
 
-    private fun getTargetResId(context: Context, resId: Int): ResId {
+    fun getTargetResId(context: Context, resId: Int): ResId {
         return try {
             val resName = context.resources.getResourceEntryName(resId)
             val hookName = resName + Spdt.currentFlavor().resourceSuffix
@@ -93,7 +93,7 @@ class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource {
         }
     }
 
-    private data class ResId(
+    data class ResId(
         @AnyRes val resId: Int,
         val resName: String,
         val hookResName: String,

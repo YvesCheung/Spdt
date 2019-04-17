@@ -7,4 +7,4 @@ if (!isJenkins()) { //本地才包含demo
 }
 include ':spdt-plugin', ':spdt-api',
         ':spdt-annotation', ':spdt-compiler',
-        ':spdt-data'
+        ':spdt-data', 'spdt-support'

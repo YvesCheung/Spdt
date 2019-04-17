@@ -22,6 +22,7 @@ import java.util.*
  */
 internal class SpdtSkinClient : SkinClient {
 
+    //要加个条件，support模块引入时用support的skinFactory 和  support的skinManager
     private var skinManager: SpdtSkinManager? = null
 
     override fun applySkin(app: Application): SpdtSkinManager =

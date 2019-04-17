@@ -25,7 +25,6 @@ class SpdtTextAttrsHelper(
     private var mDrawableTop: Int = INVALID_ID
     private var mDrawaleBottom: Int = INVALID_ID
 
-
     //初始化时走这个
     override fun onLoadAttributes() {
         loadAttributes(R.styleable.SpdtTextAppearance) {
