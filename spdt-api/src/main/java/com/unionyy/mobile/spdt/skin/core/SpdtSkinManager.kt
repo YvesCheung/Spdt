@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.support.annotation.AnyRes
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
+import android.support.v4.content.ContextCompat
 import com.unionyy.mobile.spdt.Spdt
 import com.unionyy.mobile.spdt.skin.SkinResource
 
@@ -35,14 +36,14 @@ open class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource 
 
     override fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList =
         swapResId(context, resId) { id ->
-            getColorStateList(id)
+            ContextCompat.getColorStateList(context, resId) ?: getColorStateList(resId)
         }
 
     override fun getColor(resId: Int): Int = getColor(spdtCtx.app, resId)
 
     override fun getColor(context: Context, @ColorRes resId: Int): Int =
         swapResId(context, resId) { id ->
-            getColor(id)
+            ContextCompat.getColor(context, id)
         }
 
     override fun getString(resId: Int): String = getString(spdtCtx.app, resId)
