@@ -36,7 +36,7 @@ open class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource 
 
     override fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList =
         swapResId(context, resId) { id ->
-            ContextCompat.getColorStateList(context, resId) ?: getColorStateList(resId)
+            getColorStateList(resId, context.theme)
         }
 
     override fun getColor(resId: Int): Int = getColor(spdtCtx.app, resId)
