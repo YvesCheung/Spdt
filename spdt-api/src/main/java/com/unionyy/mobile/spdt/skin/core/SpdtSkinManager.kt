@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.support.annotation.AnyRes
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
@@ -36,7 +37,11 @@ open class SpdtSkinManager(private val spdtCtx: SpdtSkinContext) : SkinResource 
 
     override fun getColorStateList(context: Context, @ColorRes resId: Int): ColorStateList =
         swapResId(context, resId) { id ->
-            getColorStateList(resId, context.theme)
+            if (Build.VERSION.SDK_INT >= 23) {
+                getColorStateList(id, context.theme)
+            } else {
+                getColorStateList(id)
+            }
         }
 
     override fun getColor(resId: Int): Int = getColor(spdtCtx.app, resId)
