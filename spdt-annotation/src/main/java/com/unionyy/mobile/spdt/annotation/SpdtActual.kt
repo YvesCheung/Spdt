@@ -4,7 +4,7 @@ import com.unionyy.mobile.spdt.api.DefaultFlavor
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
 annotation class SpdtActual(
     val value: KClass<out SpdtFlavor> = DefaultFlavor::class,

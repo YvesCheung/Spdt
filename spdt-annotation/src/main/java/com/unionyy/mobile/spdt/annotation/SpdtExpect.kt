@@ -1,6 +1,6 @@
 package com.unionyy.mobile.spdt.annotation
 
 @Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.SOURCE)
+@Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
 annotation class SpdtExpect
