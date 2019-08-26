@@ -20,7 +20,7 @@ internal object SkinLifecycle {
         val factoryDelegate = SpdtFactoryDelegate(spdtContext.factoryList)
         val app = spdtContext.app
 
-        installLayoutFactory(app, factoryDelegate)
+//        installLayoutFactory(app, factoryDelegate)
         app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityPaused(activity: Activity) {
             }
