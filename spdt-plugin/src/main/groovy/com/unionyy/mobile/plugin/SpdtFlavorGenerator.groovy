@@ -40,8 +40,15 @@ class SpdtFlavorGenerator {
             def task = project.tasks.create("generate${capitalize(variant.name)}SpdtFlavor")
             task.inputs.property("useAndroidX", useAndroidX)
             task.group = "spdt"
+
             variant.registerJavaGeneratingTask(task, outputDir)
-            println("SPDT,configGenerateFlavorTask, create ${capitalize(variant.name)}'s generate task")
+            def generateBuildConfigTask = project.tasks.findByName(
+                    "generate${capitalize(variant.name)}BuildConfig")
+            if (generateBuildConfigTask != null) {
+                generateBuildConfigTask.dependsOn task
+            }
+            println("SpdtPlugin: configGenerateFlavorTask, create ${capitalize(variant.name)}'s generate task")
+
             task.doLast {
                 deleteFile(outputDir)
                 writeJavaClass(outputDir, new SpdtConfigData(config.toList(), config.current.flavorName))
