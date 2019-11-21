@@ -30,8 +30,13 @@
         <attr name="android:shadowDx" />
         <attr name="android:shadowRadius" />
     </declare-styleable>
+
     <declare-styleable name="SpdtProgressBar">
         <attr name="android:indeterminateDrawable" />
         <attr name="android:progressDrawable" />
+    </declare-styleable>
+
+    <declare-styleable name="SpdtSeekBar">
+        <attr name="android:thumb" />
     </declare-styleable>
 </resources>

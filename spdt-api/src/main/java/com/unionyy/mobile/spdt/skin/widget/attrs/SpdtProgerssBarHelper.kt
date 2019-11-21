@@ -5,9 +5,10 @@ import android.widget.ProgressBar
 import com.unionyy.mobile.spdt.Spdt
 import com.unionyy.mobile.spdt.api.R
 
-class SpdtProgerssBarHelper(view: ProgressBar,
-                            attrs: AttributeSet?,
-                            defStyleAttr: Int
+class SpdtProgerssBarHelper(
+    view: ProgressBar,
+    attrs: AttributeSet?,
+    defStyleAttr: Int
 ) : AttributeHelper(view, attrs, defStyleAttr) {
 
     private var mIndeterminateDrawable: Int = INVALID_ID
