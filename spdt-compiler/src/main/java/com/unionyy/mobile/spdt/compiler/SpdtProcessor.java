@@ -20,13 +20,6 @@ import javax.lang.model.element.TypeElement;
  * Created by 张宇 on 2019/2/21.
  * E-mail: zhangyu4@yy.com
  * YY: 909017428
- * <p>
- * https://youtrack.jetbrains.com/issue/KT-17883
- * <p>
- * https://github.com/square/kotlinpoet/issues/105
- * kotlinpoet now is not support write the **.kt to filer
- * <p>
- * apt 最好还是不要生成.kt文件阿
  */
 @AutoService(Processor.class)//自动生成 javax.annotation.processing.IProcessor 文件
 @SupportedSourceVersion(SourceVersion.RELEASE_7)//java版本支持
