@@ -6,7 +6,7 @@ import com.unionyy.mobile.spdt.api.DefaultFlavor;
 
 public class JavaTest {
 
-    interface UI {
+    public interface UI {
 
         void a();
     }
