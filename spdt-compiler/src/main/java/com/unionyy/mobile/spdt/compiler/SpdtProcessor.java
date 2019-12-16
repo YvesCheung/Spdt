@@ -1,6 +1,7 @@
 package com.unionyy.mobile.spdt.compiler;
 
 import com.google.auto.service.AutoService;
+import com.unionyy.mobile.spdt.compiler.expect.ActualFactoryProcessor;
 import com.unionyy.mobile.spdt.compiler.expect.ExpectProcessor;
 import com.unionyy.mobile.spdt.compiler.inject.InjectProcessor;
 
@@ -28,7 +29,8 @@ public class SpdtProcessor extends AbstractProcessor {
     private List<IProcessor> processors = Arrays.<IProcessor>asList(
             //new FlavorProcessor(), //Use SpdtPlugin to generate the flavor class instead.
             new ExpectProcessor(),
-            new InjectProcessor()
+            new InjectProcessor(),
+            new ActualFactoryProcessor()
     );
 
     @Override

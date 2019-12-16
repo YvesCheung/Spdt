@@ -33,7 +33,7 @@ class SpdtPlugin implements Plugin<Project> {
                 initializer, namer)
 
 //        def file = project.file("spdt.tmp")
-//        processAptParam(project, file)
+        processAptParam(project)
 
         project.afterEvaluate {
             if (!config.isEmpty()) {
@@ -131,7 +131,7 @@ class SpdtPlugin implements Plugin<Project> {
         }
     }
 
-    private void processAptParam(Project project, File configFile) {
+    private void processAptParam(Project project) {
         Action<? super AppliedPlugin> addAptParam = new Action<AppliedPlugin>() {
             @Override
             void execute(AppliedPlugin appliedPlugin) {
@@ -140,7 +140,8 @@ class SpdtPlugin implements Plugin<Project> {
                         defaultConfig {
                             javaCompileOptions {
                                 annotationProcessorOptions {
-                                    it.argument('spdt_config_file', configFile.absolutePath)
+//                                    it.argument('spdt_config_file', configFile.absolutePath)
+                                    it.argument('spdt_module_name', project.name)
                                 }
                             }
                         }
