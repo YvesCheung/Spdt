@@ -13,7 +13,7 @@ object Spdt : SkinClient by SpdtSkinClient() {
 
     @JvmStatic
     fun inject(obj: Any) {
-        val injectCls = "${obj.javaClass.name}\$\$SpdtInjector"
+        val injectCls = "${obj.javaClass.name}-SpdtInjector"
         try {
             Class.forName(injectCls)
                 .getMethod("inject", obj.javaClass)
@@ -27,7 +27,7 @@ object Spdt : SkinClient by SpdtSkinClient() {
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun <Spdt : Any> of(spdtCls: Class<Spdt>): Spdt {
-        val clsName = "${spdtCls.name}\$\$SpdtFactory"
+        val clsName = "${spdtCls.name}-SpdtFactory"
         return try {
             val factory: SpdtExpectToActualFactory<Spdt> = getOrNew(clsName) {
                 Class.forName(clsName).newInstance() as SpdtExpectToActualFactory<Spdt>
@@ -43,7 +43,7 @@ object Spdt : SkinClient by SpdtSkinClient() {
     @Suppress("UNCHECKED_CAST")
     @JvmStatic
     fun <Spdt : Any> ofOrNull(spdtCls: Class<Spdt>): Spdt? {
-        val clsName = "${spdtCls.name}\$\$SpdtFactory"
+        val clsName = "${spdtCls.name}-SpdtFactory"
         return try {
             val factory: SpdtExpectToActualFactory<Spdt>? = getOrNew(clsName) {
                 Class.forName(clsName).newInstance() as SpdtExpectToActualFactory<Spdt>

@@ -124,7 +124,7 @@ class SpdtFlavorGenerator {
                 .build()
 
         TypeSpec spdtFactory = TypeSpec
-                .classBuilder('SpdtFlavor$$SpdtFactory')
+                .classBuilder('SpdtFlavor-SpdtFactory')
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addAnnotation(spdtKeep)
                 .addMethod(createMethod)

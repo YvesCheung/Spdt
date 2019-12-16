@@ -6,15 +6,16 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import com.sun.tools.javac.code.Type
 import com.sun.tools.javac.code.Type.ClassType
 import com.unionyy.mobile.spdt.annotation.SpdtActual
+import com.unionyy.mobile.spdt.annotation.SpdtApp
 import com.unionyy.mobile.spdt.annotation.SpdtExpect
 import com.unionyy.mobile.spdt.annotation.SpdtIndex
+import com.unionyy.mobile.spdt.annotation.SpdtKeep
 import com.unionyy.mobile.spdt.api.DefaultFlavor
 import com.unionyy.mobile.spdt.compiler.Env
 import com.unionyy.mobile.spdt.compiler.IProcessor
@@ -28,8 +29,14 @@ import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.MirroredTypesException
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter
+import kotlin.math.abs
 
 class ExpectProcessor : IProcessor {
+
+    companion object {
+
+        const val PKG_NAME = "com.unionyy.mobile.spdt.factory"
+    }
 
     private lateinit var log: Logger
 
@@ -47,7 +54,7 @@ class ExpectProcessor : IProcessor {
         val mapExpectToActual = classifyActualClass(actualClasses)
         log.info(dump(mapExpectToActual), true)
 
-        generateFactoryClass(env, mapExpectToActual)
+        generateFactoryClass(env, roundEnvironment, mapExpectToActual)
     }
 
     private fun classifyActualClass(actualClasses: Set<TypeElement>): Map<TypeMirror, Set<TypeElement>> {
@@ -160,81 +167,17 @@ class ExpectProcessor : IProcessor {
         return result
     }
 
-    private fun generateFactoryClass(env: Env, mapExpectToActual: Map<TypeMirror, Set<TypeElement>>) {
-        val moduleName = env.options["spdt_module_name"]?.capitalize()
-            ?: "Spdt" + UUID.randomUUID().toString().replace("-", "")
-        for ((expectCls, value) in mapExpectToActual) {
-            val expectClsName = ClassName.bestGuess(expectCls.toString())
-            val spdtCls = ClassName(env.packageName, "Spdt")
-            val factoryName = ClassName(env.packageName, "SpdtExpectToActualFactory")
 
-            val createMethodBuilder = FunSpec.builder("create")
-                .addModifiers(KModifier.OVERRIDE)
-                .addStatement("val flavorCls = %T.currentFlavor()::class", spdtCls)
-                .returns(expectClsName.copy(nullable = true))
-
-            var defaultFlavor: TypeElement? = null
-            for (actualCls in value) {
-                val flavors = getAnnotationParam(actualCls)
-                if (flavors.isEmpty()) {
-                    defaultFlavor = actualCls
-                    continue
-                } else if (hasDefaultFlavor(flavors)) {
-                    defaultFlavor = actualCls
-                }
-                for (flavor in flavors) {
-                    val flavorName =
-                        if (flavor is Type.ErrorType) {
-                            val origin = flavor.toString()
-                            val guessCls = ClassName.bestGuess(origin.substring(origin.indexOf(".") + 1))
-                            if (guessCls.packageName.isEmpty()) {
-                                ClassName(env.packageName + ".annotation", guessCls.toString())
-                            } else {
-                                guessCls
-                            }
-                        } else {
-                            flavor.asTypeName()
-                        }
-                    createMethodBuilder.addCode(
-                        CodeBlock
-                            .builder()
-                            .beginControlFlow("if (flavorCls === %T::class)", flavorName)
-                            .addStatement("return %T()", actualCls)
-                            .endControlFlow()
-                            .build()
-                    )
-                }
-            }
-
-            val createMethod =
-                if (defaultFlavor != null) {
-                    createMethodBuilder
-                        .addStatement("return %T()", defaultFlavor)
-                        .build()
-                } else {
-                    createMethodBuilder
-                        .addStatement("return null")
-                        .build()
-                }
-
-            val indexAnnotation = AnnotationSpec.builder(SpdtIndex::class)
-                .addMember("clsName = %S", expectClsName)
-                .build()
-            val baseFactory: ParameterizedTypeName = factoryName.parameterizedBy(expectClsName)
-            val factoryCls = TypeSpec
-                .classBuilder("$moduleName${expectClsName.reflectionName().hashCode()}SpdtFactory")
-                .addSuperinterface(baseFactory)
-                .addModifiers(KModifier.FINAL, KModifier.PUBLIC)
-                .addFunction(createMethod)
-                .addAnnotation(indexAnnotation)
-                .build()
-
-            try {
-                FileSpec.get(PKG_NAME, factoryCls).writeTo(env.filer)
-            } catch (e: IOException) {
-                log.warn(e.message)
-            }
-        }
+    private fun generateFactoryClass(
+        env: Env,
+        roundEnvironment: RoundEnvironment,
+        mapExpectToActual: Map<TypeMirror, Set<TypeElement>>
+    ) {
+        val appElement =
+            roundEnvironment.getElementsAnnotatedWith(SpdtApp::class.java)
+        val isApp = appElement != null && appElement.isNotEmpty()
+        val generator = if (isApp) AppFactoryGenerator() else LibraryFactoryGenerator()
+        generator.generateFactoryClass(env, mapExpectToActual)
     }
 
     private fun isObject(obj: TypeMirror?): Boolean {
@@ -336,8 +279,128 @@ class ExpectProcessor : IProcessor {
             SpdtExpect::class.java.canonicalName)
     }
 
-    companion object {
+    interface ExpectToActualFactoryGenerator {
 
-        const val PKG_NAME = "com.unionyy.mobile.spdt.factory"
+        fun generateFactoryClass(env: Env, mapExpectToActual: Map<TypeMirror, Set<TypeElement>>)
+    }
+
+    private inner class LibraryFactoryGenerator : ExpectToActualFactoryGenerator {
+
+        override fun generateFactoryClass(env: Env, mapExpectToActual: Map<TypeMirror, Set<TypeElement>>) {
+            val moduleName = env.options["spdt_module_name"]?.capitalize()
+                ?: "Spdt" + UUID.randomUUID().toString().replace("-", "")
+            for ((expectCls, value) in mapExpectToActual) {
+                val factoryName = ClassName(env.packageName, "SpdtExpectToActualFactory")
+                val expectClsName = ClassName.bestGuess(expectCls.toString())
+
+                val createMethod = generateCreateFunction(env, expectClsName, value)
+
+                val indexAnnotation = AnnotationSpec.builder(SpdtIndex::class)
+                    .addMember("clsName = %S", expectClsName)
+                    .build()
+
+                val factoryCls = TypeSpec
+                    .classBuilder(moduleName +
+                        "${abs(expectClsName.reflectionName().hashCode())}" +
+                        "SpdtFactory")
+                    .addSuperinterface(factoryName.parameterizedBy(expectClsName))
+                    .addModifiers(KModifier.FINAL, KModifier.PUBLIC)
+                    .addFunction(createMethod)
+                    .addAnnotation(indexAnnotation)
+                    .build()
+
+                try {
+                    FileSpec.get(PKG_NAME, factoryCls).writeTo(env.filer)
+                } catch (e: IOException) {
+                    log.warn(e.message)
+                }
+            }
+        }
+    }
+
+    private inner class AppFactoryGenerator : ExpectToActualFactoryGenerator {
+
+        override fun generateFactoryClass(env: Env, mapExpectToActual: Map<TypeMirror, Set<TypeElement>>) {
+            for ((expectCls, value) in mapExpectToActual) {
+                val expectClsName = ClassName.bestGuess(expectCls.toString())
+                val factoryName = ClassName(env.packageName, "SpdtExpectToActualFactory")
+
+                val createMethod = generateCreateFunction(env, expectClsName, value)
+
+                val className = expectClsName.reflectionName()
+                    .replaceFirst((expectClsName.packageName + "."), "")
+
+                val factoryCls = TypeSpec
+                    .classBuilder("$className-SpdtFactory")
+                    .addSuperinterface(factoryName.parameterizedBy(expectClsName))
+                    .addModifiers(KModifier.FINAL, KModifier.PUBLIC)
+                    .addFunction(createMethod)
+                    .addAnnotation(SpdtKeep::class)
+                    .build()
+
+                try {
+                    FileSpec.get(expectClsName.packageName, factoryCls).writeTo(env.filer)
+                } catch (e: IOException) {
+                    log.warn(e.message)
+                }
+            }
+        }
+    }
+
+    private fun generateCreateFunction(
+        env: Env,
+        expectCls: ClassName,
+        value: Set<TypeElement>
+    ): FunSpec {
+
+        val spdtCls = ClassName(env.packageName, "Spdt")
+
+        val createMethodBuilder = FunSpec.builder("create")
+            .addModifiers(KModifier.OVERRIDE)
+            .returns(expectCls.copy(nullable = true))
+            .addStatement("val flavorCls = %T.currentFlavor()::class", spdtCls)
+
+        var defaultFlavor: TypeElement? = null
+        for (actualCls in value) {
+            val flavors = getAnnotationParam(actualCls)
+            if (flavors.isEmpty()) {
+                defaultFlavor = actualCls
+                continue
+            } else if (hasDefaultFlavor(flavors)) {
+                defaultFlavor = actualCls
+            }
+            for (flavor in flavors) {
+                val flavorName =
+                    if (flavor is Type.ErrorType) {
+                        val origin = flavor.toString()
+                        val guessCls = ClassName.bestGuess(origin.substring(origin.indexOf(".") + 1))
+                        if (guessCls.packageName.isEmpty()) {
+                            ClassName(env.packageName + ".annotation", guessCls.toString())
+                        } else {
+                            guessCls
+                        }
+                    } else {
+                        flavor.asTypeName()
+                    }
+                createMethodBuilder.addCode(
+                    CodeBlock
+                        .builder()
+                        .beginControlFlow("if (flavorCls === %T::class)", flavorName)
+                        .addStatement("return %T()", actualCls)
+                        .endControlFlow()
+                        .build()
+                )
+            }
+        }
+
+        return if (defaultFlavor != null) {
+            createMethodBuilder
+                .addStatement("return %T()", defaultFlavor)
+                .build()
+        } else {
+            createMethodBuilder
+                .addStatement("return null")
+                .build()
+        }
     }
 }

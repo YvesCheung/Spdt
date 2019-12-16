@@ -3,25 +3,20 @@ package com.unionyy.mobile.spdt
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
-import com.unionyy.mobile.spdt.annotation.SpdtInject
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : Activity() {
 
 //    private val getter = Spdt.currentFlavor()
 
-    @SpdtInject
-    lateinit var getter: AppidGetter
+    val getter: AppidGetter by spdtInject()
 
-    @SpdtInject
-    lateinit var `我是中文`: AppidGetter
+    val `我是中文`: AppidGetter by spdtInject()
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        Spdt.inject(this)
 
         textView.text = Test().test.appid + " " + 我是中文.appid
 

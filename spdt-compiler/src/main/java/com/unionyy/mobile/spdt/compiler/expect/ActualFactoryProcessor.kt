@@ -37,6 +37,7 @@ class ActualFactoryProcessor : IProcessor {
                 val genPackage = env.elements.getPackageElement(ExpectProcessor.PKG_NAME)
                     ?: return
                 for (element in ElementFilter.typesIn(genPackage.enclosedElements)) {
+                    log.info("middle factory = $element")
                     val index = element.getAnnotation(SpdtIndex::class.java)
                     if (index != null) {
                         val list = map[index.clsName]
@@ -82,7 +83,7 @@ class ActualFactoryProcessor : IProcessor {
                 .build()
 
             val expectClsSimpleName = expectClsName.simpleNames.joinToString(separator = "$")
-            val typeName = "$expectClsSimpleName\$\$SpdtFactory"
+            val typeName = "$expectClsSimpleName-SpdtFactory"
             val factoryCls = TypeSpec
                 .classBuilder(typeName)
                 .addSuperinterface(factoryName.parameterizedBy(expectClsName))
