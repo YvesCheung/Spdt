@@ -162,6 +162,7 @@ class ExpectProcessor : IProcessor {
 
     private fun generateFactoryClass(env: Env, mapExpectToActual: Map<TypeMirror, Set<TypeElement>>) {
         for ((expectCls, value) in mapExpectToActual) {
+
             val expectClsName = expectCls.asTypeName()
             val spdtCls = ClassName(env.packageName, "Spdt")
             val factoryName = ClassName(env.packageName, "SpdtExpectToActualFactory")
@@ -202,37 +203,37 @@ class ExpectProcessor : IProcessor {
                             .build()
                     )
                 }
+            }
 
-                val createMethod =
-                    if (defaultFlavor != null) {
-                        createMethodBuilder
-                            .addStatement("return %T()", defaultFlavor)
-                            .build()
-                    } else {
-                        createMethodBuilder
-                            .addStatement("return null")
-                            .build()
-                    }
-
-                val indexAnnotation = AnnotationSpec.builder(SpdtIndex::class)
-                    .addMember("clsName = %S", expectClsName)
-                    .build()
-                val packageName = "com.unionyy.mobile.spdt.factory"
-                val baseFactory: ParameterizedTypeName = factoryName.parameterizedBy(expectClsName)
-                val className = "Spdt" + UUID.randomUUID().toString().replace("-", "")
-                val factoryCls = TypeSpec
-                    .classBuilder("${className}SpdtFactory")
-                    .addSuperinterface(baseFactory)
-                    .addModifiers(KModifier.FINAL, KModifier.PUBLIC)
-                    .addFunction(createMethod)
-                    .addAnnotation(indexAnnotation)
-                    .build()
-
-                try {
-                    FileSpec.get(packageName, factoryCls).writeTo(env.filer)
-                } catch (e: IOException) {
-                    log.warn(e.message)
+            val createMethod =
+                if (defaultFlavor != null) {
+                    createMethodBuilder
+                        .addStatement("return %T()", defaultFlavor)
+                        .build()
+                } else {
+                    createMethodBuilder
+                        .addStatement("return null")
+                        .build()
                 }
+
+            val indexAnnotation = AnnotationSpec.builder(SpdtIndex::class)
+                .addMember("clsName = %S", expectClsName)
+                .build()
+            val packageName = "com.unionyy.mobile.spdt.factory"
+            val baseFactory: ParameterizedTypeName = factoryName.parameterizedBy(expectClsName)
+            val className = "Spdt" + UUID.randomUUID().toString().replace("-", "")
+            val factoryCls = TypeSpec
+                .classBuilder("${className}SpdtFactory")
+                .addSuperinterface(baseFactory)
+                .addModifiers(KModifier.FINAL, KModifier.PUBLIC)
+                .addFunction(createMethod)
+                .addAnnotation(indexAnnotation)
+                .build()
+
+            try {
+                FileSpec.get(packageName, factoryCls).writeTo(env.filer)
+            } catch (e: IOException) {
+                log.warn(e.message)
             }
         }
     }
