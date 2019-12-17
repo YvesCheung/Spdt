@@ -385,7 +385,7 @@ class ExpectProcessor : IProcessor {
                 createMethodBuilder.addCode(
                     CodeBlock
                         .builder()
-                        .beginControlFlow("if (flavorCls === %T::class)", flavorName)
+                        .beginControlFlow("if (flavorCls == %T::class)", flavorName)
                         .addStatement("return %T()", actualCls)
                         .endControlFlow()
                         .build()

@@ -11,11 +11,12 @@ sourceSets {
 }
 
 dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     compileOnly "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     compileOnly gradleApi()
     compile localGroovy()
     compile "com.android.tools.build:gradle:3.0.0"
-    compile 'com.squareup:javapoet:1.8.0'
+    compile 'com.squareup:kotlinpoet:1.4.4'
 
     compile project(":spdt-data")
 }

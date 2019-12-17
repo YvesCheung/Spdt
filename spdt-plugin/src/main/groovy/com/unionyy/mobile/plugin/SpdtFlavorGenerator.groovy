@@ -3,15 +3,12 @@ package com.unionyy.mobile.plugin
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
-import com.squareup.javapoet.*
+import com.squareup.kotlinpoet.*
 import com.unionyy.mobile.spdt.data.SpdtConfigData
 import com.unionyy.mobile.spdt.data.SpdtFlavorData
 import org.gradle.api.Project
 import org.gradle.api.internal.DefaultDomainObjectSet
-import org.jetbrains.annotations.NotNull
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
-
-import javax.lang.model.element.Modifier
 
 class SpdtFlavorGenerator {
 
@@ -70,69 +67,59 @@ class SpdtFlavorGenerator {
         String spdtPackage = "com.unionyy.mobile.spdt"
         String annoPackage = spdtPackage + ".annotation"
 
-        ClassName spdtFlavor = ClassName.get(annoPackage, "SpdtFlavor")
+        ClassName spdtFlavor = new ClassName(annoPackage, "SpdtFlavor")
         for (SpdtFlavorData flavor : config.getFlavors()) {
 
-            MethodSpec constructor = MethodSpec.constructorBuilder()
+            FunSpec constructor = FunSpec.constructorBuilder()
+                    .addModifiers(KModifier.INTERNAL)
                     .build()
 
-            MethodSpec appid = MethodSpec.methodBuilder("getAppid")
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(NotNull.class)
-                    .addAnnotation(Override.class)
-                    .returns(String.class)
-                    .addStatement('return $S', flavor.getAppid())
+            ClassName kotlinString = new ClassName("kotlin", "String")
+
+            PropertySpec appid = PropertySpec.builder("appid", kotlinString)
+                    .addModifiers(KModifier.PUBLIC, KModifier.OVERRIDE)
+                    .initializer("%S", flavor.getAppid())
                     .build()
 
-            MethodSpec resourceSuffix = MethodSpec.methodBuilder("getResourceSuffix")
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(NotNull.class)
-                    .addAnnotation(Override.class)
-                    .returns(String.class)
-                    .addStatement('return $S', flavor.getResourceSuffix())
+            PropertySpec resourceSuffix = PropertySpec.builder("resourceSuffix", kotlinString)
+                    .addModifiers(KModifier.PUBLIC, KModifier.OVERRIDE)
+                    .initializer("%S", flavor.getResourceSuffix())
                     .build()
 
             TypeSpec flavorCls = TypeSpec.classBuilder(flavor.getFlavorName())
-                    .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
-                    .addMethod(appid)
-                    .addMethod(resourceSuffix)
-                    .addMethod(constructor)
-                    .addSuperinterface(spdtFlavor)
+                    .primaryConstructor(constructor)
+                    .addModifiers(KModifier.FINAL, KModifier.PUBLIC)
+                    .addProperty(appid)
+                    .addProperty(resourceSuffix)
+                    .addSuperinterface(spdtFlavor, CodeBlock.EMPTY)
                     .build()
 
-            JavaFile.builder(annoPackage, flavorCls)
-                    .build()
+            FileSpec.get(annoPackage, flavorCls)
                     .writeTo(output)
         }
 
-        ClassName current = ClassName.get(
-                annoPackage, config.getCurrentFlavor())
-        ClassName factory = ClassName.get(
-                spdtPackage, "SpdtExpectToActualFactory")
-        ClassName spdtKeep = ClassName.get(
-                annoPackage, "SpdtKeep")
+        ClassName current = new ClassName(annoPackage, config.getCurrentFlavor())
+        ClassName factory = new ClassName(spdtPackage, "SpdtExpectToActualFactory")
+        ClassName spdtKeep = new ClassName(annoPackage, "SpdtKeep")
 
         ParameterizedTypeName superFactory = ParameterizedTypeName.get(factory, spdtFlavor)
 
-        MethodSpec createMethod = MethodSpec
-                .methodBuilder("create")
+        FunSpec createMethod = FunSpec
+                .builder("create")
                 .returns(spdtFlavor)
-                .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(Override.class)
-                .addAnnotation(NotNull.class)
-                .addStatement('return new $T()', current)
+                .addModifiers(KModifier.PUBLIC, KModifier.OVERRIDE)
+                .addStatement('return %T()', current)
                 .build()
 
         TypeSpec spdtFactory = TypeSpec
                 .classBuilder('SpdtFlavor-SpdtFactory')
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addModifiers(KModifier.PUBLIC, KModifier.FINAL)
                 .addAnnotation(spdtKeep)
-                .addMethod(createMethod)
-                .addSuperinterface(superFactory)
+                .addFunction(createMethod)
+                .addSuperinterface(superFactory, CodeBlock.EMPTY)
                 .build()
 
-        JavaFile.builder(annoPackage, spdtFactory)
-                .build()
+        FileSpec.get(annoPackage, spdtFactory)
                 .writeTo(output)
 
     }
