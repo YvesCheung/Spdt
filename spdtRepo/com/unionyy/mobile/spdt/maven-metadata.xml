@@ -4,9 +4,8 @@
   <artifactId>spdt</artifactId>
   <versioning>
     <versions>
-      <version>2.0.7-SNAPSHOT</version>
       <version>2.0.8-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20191216091541</lastUpdated>
+    <lastUpdated>20191217033934</lastUpdated>
   </versioning>
 </metadata>

@@ -14,8 +14,8 @@
     </dependency>
     <dependency>
       <groupId>com.squareup</groupId>
-      <artifactId>javapoet</artifactId>
-      <version>1.8.0</version>
+      <artifactId>kotlinpoet</artifactId>
+      <version>1.4.4</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
