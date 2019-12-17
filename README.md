@@ -1,7 +1,7 @@
 # 单刀双掷（Single-Pole Double-Throw）
 
 
-![](https://i.imgur.com/RUP8U27.png)
+![](https://github.com/YvesCheung/Spdt/blob/master/art/SPDT.png?raw=true)
 
 ## 背景
 
@@ -101,7 +101,7 @@ class Demo {
     }
     
     public static void main(String[] args) {
-        System.out.println(getInstance().myName())
+        System.out.println(getInstance().myName());
     }
 }
 ```
@@ -118,6 +118,13 @@ val namer2: Namer = Spdt.of(Namer::class)
 
 注意 `@SpdtActual` 标记的实现类绝**不是**单例。
 上面例子中的 `namer` 和 `namer2` 虽然都是 `Namer` 类型，但它们并不会指向同一个对象。
+
+### 变体的实现分布在多模块
+
+![](https://github.com/YvesCheung/Spdt/blob/master/art/SPDT%E5%A4%9A%E6%A8%A1%E5%9D%97%E6%94%AF%E6%8C%81.png?raw=true)
+
+SPDT支持实现类在不同的模块，最终通过AnnotationProcessor在App模块生成最后的工厂类。
+
 
 ### 资源差异化
 
