@@ -112,29 +112,12 @@ class Demo {
 //if the current flavor is 'WhateverNameYouDefined',
 //the field 'namer' will be null.
 val namer: Namer? = Spdt.ofOrNull(Namer::class)
-```
 
-如果一个类中使用了多个由 `Spdt` 管理的接口，那么通过注入实例会更方便：
-
-```kotlin
-class MainActivity: Activity {
-
-    @SpdtInject
-    lateinit var instanceA: Namer
-    
-    @SpdtInject
-    @JvmField
-    var instanceB: Namer? = null
-
-    fun onCreate(context: Context) {
-        super.onCreate(context)
-        Spdt.inject(this)
-    }
-}
+val namer2: Namer = Spdt.of(Namer::class)
 ```
 
 注意 `@SpdtActual` 标记的实现类绝**不是**单例。
-上面例子中的 `instanceA` 和 `instanceB` 虽然都是 `Namer` 类型，但它们并不会指向同一个对象。
+上面例子中的 `namer` 和 `namer2` 虽然都是 `Namer` 类型，但它们并不会指向同一个对象。
 
 ### 资源差异化
 
@@ -238,5 +221,7 @@ class MainActivity: Activity() {
     
 3. 添加 `Proguard` 混淆规则
     ```proguard
-    -keep @com.unionyy.mobile.spdt.annotation.SpdtKeep class * {*;}
+    -keepnames @interface com.unionyy.mobile.spdt.annotation.*
+    -keep @com.unionyy.mobile.spdt.annotation.SpdtKeep class * { public <methods>; }
+    -keepnames @com.unionyy.mobile.spdt.annotation.SpdtExpect class *
     ```
