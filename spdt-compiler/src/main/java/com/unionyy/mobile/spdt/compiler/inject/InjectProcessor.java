@@ -30,6 +30,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 
+@Deprecated
 public class InjectProcessor implements IProcessor {
 
     private Logger logger;
