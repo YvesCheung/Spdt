@@ -9,6 +9,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.unionyy.mobile.spdt.annotation.SpdtApp
 import com.unionyy.mobile.spdt.annotation.SpdtIndex
+import com.unionyy.mobile.spdt.annotation.SpdtKeep
 import com.unionyy.mobile.spdt.compiler.Env
 import com.unionyy.mobile.spdt.compiler.IProcessor
 import com.unionyy.mobile.spdt.compiler.Logger
@@ -88,6 +89,7 @@ class ActualFactoryProcessor : IProcessor {
                 .classBuilder(typeName)
                 .addSuperinterface(factoryName.parameterizedBy(expectClsName))
                 .addFunction(createMethod)
+                .addAnnotation(SpdtKeep::class)
                 .build()
 
             FileSpec.builder(expectClsName.packageName, typeName)
