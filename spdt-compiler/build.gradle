@@ -27,46 +27,20 @@ tasks.withType(JavaCompile) {
 
 version = spdt_version
 
-apply from: '../publish_java.gradle'
+ext {
+    libraryGroupId = 'com.unionyy.mobile'
+    libraryName = 'spdt-compiler'
 
-publishing {
+    libraryDescription = 'Build variants with different source code & resource.'
 
-    publications {
-        maven(MavenPublication) {
-            groupId 'com.unionyy.mobile'
-            artifactId 'spdt-compiler'
-            // Tell maven to prepare the generated "*.aar" file for publishing
-            artifact("$buildDir/libs/${project.getName()}-${version}.jar")
-            artifact androidSourcesJar
+    siteUrl = 'https://github.com/YvesCheung/Spdt'
+    gitUrl = 'https://github.com/YvesCheung/Spdt.git'
 
-            pom.withXml {
-                //Creating additional node for dependencies
-                def dependenciesNode = asNode().appendNode('dependencies')
+    libraryVersion = version
 
-                //Defining configuration names from which dependencies will be taken (debugCompile or releaseCompile and compile)
-                def configurationNames = ['compile']
-
-                configurationNames.each { configurationName ->
-                    configurations[configurationName].allDependencies.each {
-                        if (it.group != null && it.name != null) {
-                            def dependencyNode = dependenciesNode.appendNode('dependency')
-                            dependencyNode.appendNode('groupId', it.group)
-                            dependencyNode.appendNode('artifactId', it.name)
-                            dependencyNode.appendNode('version', it.version)
-
-                            //If there are any exclusions in dependency
-                            if (it.excludeRules.size() > 0) {
-                                def exclusionsNode = dependencyNode.appendNode('exclusions')
-                                it.excludeRules.each { rule ->
-                                    def exclusionNode = exclusionsNode.appendNode('exclusion')
-                                    exclusionNode.appendNode('groupId', rule.group)
-                                    exclusionNode.appendNode('artifactId', rule.module)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    developerId = 'YvesCheung'
+    developerName = 'YvesCheung'
+    developerEmail = '975135274@qq.com'
 }
+
+apply from: '../gradle/publish.gradle'
