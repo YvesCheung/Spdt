@@ -14,7 +14,10 @@ buildscript {
         classpath "com.android.tools.build:gradle:${gradle_version}"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'net.researchgate:gradle-release:2.6.0'
-        classpath "com.unionyy.mobile:spdt:$version"
+        
+        if(!isRemoteCI()){
+            classpath "com.unionyy.mobile:spdt:$version"
+        }
     }
 }
 
@@ -38,4 +41,8 @@ release {
     failOnUpdateNeeded = false
     buildTasks = []
     versionPropertyFile = "gradle.properties"
+}
+
+static def isRemoteCI() {
+    return System.getenv("BUILD_NUMBER") != null || System.getenv("JITPACK") != null
 }
