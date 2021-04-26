@@ -56,4 +56,4 @@ ext {
 apply from: '../gradle/publish.gradle'
 
 task install(dependsOn: 'publishToMavenLocal')
-tasks.findByName('publishToMavenLocal').dependsOn('build')
+tasks.findByName('publishToMavenLocal').dependsOn('assembleRelease')
