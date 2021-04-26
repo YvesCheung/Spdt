@@ -1,10 +1,10 @@
-static def isJenkins() {
-    return System.getenv("BUILD_NUMBER") != null
+static def isRemoteCI() {
+    return System.getenv("BUILD_NUMBER") != null || System.getenv("JITPACK") != null
 }
 
-if (!isJenkins()) { //本地才包含demo
+if (!isRemoteCI()) { //本地才包含demo
     include ':app', ':library'
 }
 include ':spdt-plugin', ':spdt-api',
-        ':spdt-annotation', ':spdt-compiler',
-        ':spdt-data', 'spdt-support'
+    ':spdt-annotation', ':spdt-compiler',
+    ':spdt-data', 'spdt-support'
