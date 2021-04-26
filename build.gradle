@@ -15,7 +15,7 @@ buildscript {
         classpath 'net.researchgate:gradle-release:2.6.0'
 
         if (System.getenv("BUILD_NUMBER") == null && System.getenv("JITPACK") == null) {
-            classpath "com.unionyy.mobile:spdt:$version"
+            classpath "com.github.YvesCheung.Spdt:spdt-plugin:$version"
         }
     }
 }

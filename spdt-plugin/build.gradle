@@ -1,10 +1,13 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
+final String generatedFilePath = "./build/generated/sources/buildConfig/"
+
 sourceSets {
     main {
         java {
             include '**/*.groovy'
+            srcDir generatedFilePath
         }
     }
 }
@@ -25,8 +28,8 @@ compileJava {
 }
 
 ext {
-    libraryGroupId = 'com.unionyy.mobile'
-    libraryName = 'spdt'
+    libraryGroupId = 'com.github.YvesCheung.Spdt'
+    libraryName = 'spdt-plugin'
 
     libraryDescription = 'Build variants with different source code & resource.'
 
@@ -41,6 +44,21 @@ ext {
 }
 
 apply from: '../gradle/publish.gradle'
+
+afterEvaluate {
+    String code = """
+package com.unionyy.mobile.plugin
+
+class BuildConfig {
+    static final String version = "$version"
+    static final String groupId = "$group"
+}
+"""
+    File generateFile =
+        file("${generatedFilePath}com/unionyy/mobile/plugin/BuildConfig.groovy")
+    generateFile.parentFile.mkdirs()
+    generateFile.write(code)
+}
 
 //./gradlew :spdt-plugin:clean :spdt-plugin:publishToMavenLocal
 

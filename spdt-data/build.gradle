@@ -32,7 +32,7 @@ dependencies {
 }
 
 ext {
-    libraryGroupId = 'com.unionyy.mobile'
+    libraryGroupId = 'com.github.YvesCheung.Spdt'
     libraryName = 'spdt-data'
 
     libraryDescription = 'Build variants with different source code & resource.'

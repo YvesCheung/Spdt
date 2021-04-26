@@ -28,7 +28,7 @@ tasks.withType(JavaCompile) {
 version = spdt_version
 
 ext {
-    libraryGroupId = 'com.unionyy.mobile'
+    libraryGroupId = 'com.github.YvesCheung.Spdt'
     libraryName = 'spdt-compiler'
 
     libraryDescription = 'Build variants with different source code & resource.'

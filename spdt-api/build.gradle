@@ -38,7 +38,7 @@ dependencies {
 version = spdt_version
 
 ext {
-    libraryGroupId = 'com.unionyy.mobile'
+    libraryGroupId = 'com.github.YvesCheung.Spdt'
     libraryName = 'spdt-api'
 
     libraryDescription = 'Build variants with different source code & resource.'
