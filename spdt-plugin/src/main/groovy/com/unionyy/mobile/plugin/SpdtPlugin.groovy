@@ -4,8 +4,11 @@ import com.google.gson.Gson
 import com.unionyy.mobile.spdt.data.SpdtConfigData
 import com.unionyy.mobile.spdt.data.SpdtFlavorData
 import org.gradle.api.*
+import org.gradle.api.internal.CollectionCallbackActionDecorator
 import org.gradle.api.plugins.AppliedPlugin
-import org.gradle.internal.reflect.DirectInstantiator
+import org.gradle.internal.reflect.Instantiator
+
+import javax.inject.Inject
 
 /**
  * Created by 张宇 on 2019/2/21.
@@ -14,13 +17,20 @@ import org.gradle.internal.reflect.DirectInstantiator
  */
 class SpdtPlugin implements Plugin<Project> {
 
-    private def initializer = DirectInstantiator.INSTANCE
-
     private def namer = new Namer<SpdtFlavorData>() {
         @Override
         String determineName(SpdtFlavorData spdtFlavor) {
             return spdtFlavor.flavorName
         }
+    }
+
+    private final Instantiator instantiator
+    private final CollectionCallbackActionDecorator collectionCallbackActionDecorator
+
+    @Inject
+    SpdtPlugin(Instantiator instantiator, CollectionCallbackActionDecorator collectionCallbackActionDecorator) {
+        this.instantiator = instantiator
+        this.collectionCallbackActionDecorator = collectionCallbackActionDecorator
     }
 
     @Override
@@ -29,8 +39,8 @@ class SpdtPlugin implements Plugin<Project> {
 
         addDependency(project)
 
-        def config = project.extensions.create(SpdtConfigContainer, "spdt", DefaultSpdtConfigContainer,
-                initializer, namer)
+        def config = project.extensions.create(
+            SpdtConfigContainer, "spdt", DefaultSpdtConfigContainer, instantiator, namer, collectionCallbackActionDecorator)
 
 //        def file = project.file("spdt.tmp")
         processAptParam(project)
@@ -47,7 +57,7 @@ class SpdtPlugin implements Plugin<Project> {
 
     private static void addDependency(Project project) {
 
-        def version = "2.1.1-SNAPSHOT"
+        def version = "2.1.2-SNAPSHOT"
 
         def getDepend = { String module ->
             def moduleProject = project.findProject(":$module")
@@ -73,8 +83,8 @@ class SpdtPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             if ((project.plugins.hasPlugin('com.android.library')
-                    || project.plugins.hasPlugin('com.android.application'))
-                    && !project.plugins.hasPlugin('kotlin-android')) {
+                || project.plugins.hasPlugin('com.android.application'))
+                && !project.plugins.hasPlugin('kotlin-android')) {
                 project.dependencies.add("annotationProcessor", getDepend("spdt-compiler"))
             }
         }
@@ -94,12 +104,12 @@ class SpdtPlugin implements Plugin<Project> {
 
         if (configs.current == null) {
             throw new GradleException("Missing property of 'current' in 'spdt' config. " +
-                    "Please specify the current flavor in [${configs.join(',')}]")
+                "Please specify the current flavor in [${configs.join(',')}]")
         }
 
         def reportJavaIdentifierError = {
             throw new GradleException("The $it in 'spdt' config is not a " +
-                    "valid Java identifier.")
+                "valid Java identifier.")
         }
 
         configs.each { SpdtFlavorData flavor ->

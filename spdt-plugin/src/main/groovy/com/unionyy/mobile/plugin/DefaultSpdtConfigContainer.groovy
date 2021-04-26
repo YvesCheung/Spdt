@@ -3,6 +3,7 @@ package com.unionyy.mobile.plugin
 import com.unionyy.mobile.spdt.data.SpdtFlavorData
 import org.gradle.api.Namer
 import org.gradle.api.internal.AbstractNamedDomainObjectContainer
+import org.gradle.api.internal.CollectionCallbackActionDecorator
 import org.gradle.internal.reflect.Instantiator
 
 /**
@@ -13,8 +14,8 @@ import org.gradle.internal.reflect.Instantiator
 class DefaultSpdtConfigContainer extends AbstractNamedDomainObjectContainer<SpdtFlavorData>
         implements SpdtConfigContainer {
 
-    DefaultSpdtConfigContainer(Instantiator instantiator, Namer<SpdtFlavorData> namer) {
-        super(SpdtFlavorData, instantiator, namer)
+    DefaultSpdtConfigContainer(Instantiator instantiator, Namer<SpdtFlavorData> namer, CollectionCallbackActionDecorator callback) {
+        super(SpdtFlavorData.class, instantiator, namer, callback)
     }
 
     @Override

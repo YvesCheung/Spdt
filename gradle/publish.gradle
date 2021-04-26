@@ -5,23 +5,23 @@ group = libraryGroupId                               // Maven Group ID for the a
 version = libraryVersion
 
 if (project.hasProperty("android")) { // Android libraries
-//    task sourcesJar(type: Jar) {
-//        classifier = 'sources'
-//        getArchiveBaseName().set(libraryName)
-//        from android.sourceSets.main.java.srcDirs
-//    }
-//    task androidNativeJar(type: Jar) {
-//        classifier = 'so'
-//        from(new File(buildDir, 'libs'))
-//        include("**/*.so")
-//    }
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        getArchiveBaseName().set(libraryName)
+        from android.sourceSets.main.java.srcDirs
+    }
+    task androidNativeJar(type: Jar) {
+        classifier = 'so'
+        from(new File(buildDir, 'libs'))
+        include("**/*.so")
+    }
     ext.libraryOutputFile = "$buildDir/outputs/aar/${project.getName()}-release.aar"
 } else { // Java libraries
-//    task sourcesJar(type: Jar, dependsOn: classes) {
-//        classifier = 'sources'
-//        getArchiveBaseName().set(libraryName)
-//        from sourceSets.main.allSource
-//    }
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        getArchiveBaseName().set(libraryName)
+        from sourceSets.main.allSource
+    }
     ext.libraryOutputFile = "$buildDir/libs/${project.getName()}-${version}.jar"
 }
 println("publish $libraryOutputFile")
@@ -32,26 +32,26 @@ publishing {
             groupId libraryGroupId
             artifactId libraryName
             artifact(libraryOutputFile)
-//            artifact sourcesJar
+            artifact sourcesJar
             version libraryVersion
-//            pom {
-//                //name = libraryName
-//                description = libraryDescription
-//                url = siteUrl
-//
-//                developers {
-//                    developer {
-//                        id = developerId
-//                        name = developerName
-//                        email = developerEmail
-//                    }
-//                }
-//                scm {
-//                    connection = gitUrl
-//                    developerConnection = gitUrl
-//                    url = siteUrl
-//                }
-//            }
+            pom {
+                name = libraryName
+                description = libraryDescription
+                url = siteUrl
+
+                developers {
+                    developer {
+                        id = developerId
+                        name = developerName
+                        email = developerEmail
+                    }
+                }
+                scm {
+                    connection = gitUrl
+                    developerConnection = gitUrl
+                    url = siteUrl
+                }
+            }
             pom.withXml {
                 //Creating additional node for dependencies
                 def dependenciesNode = asNode().appendNode('dependencies')

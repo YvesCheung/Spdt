@@ -13,7 +13,7 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     compileOnly gradleApi()
     compile localGroovy()
-    compile "com.android.tools.build:gradle:3.0.0"
+    compile "com.android.tools.build:gradle:${gradle_version}"
     compile 'com.squareup:kotlinpoet:1.4.4'
 
     compile project(":spdt-data")

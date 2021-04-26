@@ -67,15 +67,15 @@ internal class SpdtSkinClient : SkinClient {
 
         override var logger: SpdtLog = object : SpdtLog {
             override fun info(tag: String, msg: Any?) {
-                Log.i(tag, msg?.toString())
+                Log.i(tag, msg.toString())
             }
 
             override fun error(tag: String, msg: Any?) {
-                Log.e(tag, msg?.toString())
+                Log.e(tag, msg.toString())
             }
 
             override fun debug(tag: String, msg: Any?) {
-                Log.d(tag, msg?.toString())
+                Log.d(tag, msg.toString())
             }
         }
 
