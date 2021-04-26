@@ -6,6 +6,8 @@ apply plugin: 'spdt'
 
 android {
     compileSdkVersion 30
+    buildToolsVersion '30.0.3'
+
     defaultConfig {
         applicationId "com.unionyy.mobile.spdt"
         minSdkVersion 14

@@ -1,5 +1,5 @@
 apply plugin: 'maven-publish'
-apply plugin: 'maven'
+//apply plugin: 'maven'
 
 group = libraryGroupId                               // Maven Group ID for the artifact
 version = libraryVersion
@@ -24,7 +24,7 @@ if (project.hasProperty("android")) { // Android libraries
     }
     ext.libraryOutputFile = "$buildDir/libs/${project.getName()}-${version}.jar"
 }
-println("publish $libraryOutputFile")
+println("artifect $libraryOutputFile")
 
 publishing {
     publications {

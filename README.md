@@ -203,22 +203,15 @@ class MainActivity: Activity() {
 
 ## 安装
 
-1. 在根项目的 `build.gradle` 中添加公司maven仓库的地址，注意 `classpath` 添加 `SPDT` 的路径，最新版本可以在 [这里](http://repo.yypm.com:8181/nexus/#nexus-search;quick~spdt) 查询。
+1. 在跟目录的 `build.gradle` 中添加classpath
     ```groovy
     buildscript {
         repositories {
-            maven { url 'http://repo.yypm.com:8181/nexus/content/groups/public' }
+            maven { url 'https://jitpack.io' }
         }
         dependencies {
-            classpath "com.unionyy.mobile:spdt:${Version.spdt_version}"
+            classpath "com.unionyy.mobile:spdt:$version"
         }
-    }
-
-    allprojects {
-        repositories {
-            maven { url 'http://repo.yypm.com:8181/nexus/content/groups/public' }
-        }
-    }
     ```
     
 2. 在使用到 `SPDT` 的模块的 `build.gradle` 中应用插件
