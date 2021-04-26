@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.unionyy.mobile</groupId>
   <artifactId>spdt-data</artifactId>
-  <version>2.1.2-SNAPSHOT</version>
+  <version>2.1.2</version>
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
