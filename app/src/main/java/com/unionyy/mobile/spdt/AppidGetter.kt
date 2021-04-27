@@ -13,13 +13,13 @@ interface AppidGetter {
 class LaotieGetter : AppidGetter {
 
     override val appid: String
-        get() = "yym141and"
+        get() = "laotie"
 }
 
 @SpdtActual(XiaoMiFlavor::class)
 class XiaomiGetter : AppidGetter {
 
     override val appid: String
-        get() = "yym139and"
+        get() = "xiaomi"
 }
 

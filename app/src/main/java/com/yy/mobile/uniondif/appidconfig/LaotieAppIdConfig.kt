@@ -10,9 +10,9 @@ import com.yy.mobile.uniondif.OuterClass.AppIdConfig
  */
 @SpdtActual(LaotieFlavor::class)
 class LaotieAppIdConfig : AppIdConfig.AppIds {
-    override val udbAppId: String = "yym141and"
-    override val crashSdkAppId: String = "yym141and"
-    override val sceneId: Int = 1022
-    override val serviceProtocolAppId: String = "yym141and"
-    override val hiidoAppKey: String = "613de4d483b0d95579d396a5c5736833"
+    override val udbAppId: String = "aaa"
+    override val crashSdkAppId: String = "aaa"
+    override val sceneId: Int = 1111
+    override val serviceProtocolAppId: String = "aaa"
+    override val hiidoAppKey: String = "aaa"
 }
