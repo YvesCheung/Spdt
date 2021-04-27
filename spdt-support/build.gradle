@@ -35,8 +35,6 @@ dependencies {
     api project(":spdt-api")
 }
 
-version = spdt_version
-
 ext {
     libraryGroupId = 'com.github.YvesCheung.Spdt'
     libraryName = 'spdt-support'
@@ -54,6 +52,3 @@ ext {
 }
 
 apply from: '../gradle/publish.gradle'
-
-task install(dependsOn: 'publishToMavenLocal')
-tasks.findByName('publishToMavenLocal').dependsOn('assembleRelease')

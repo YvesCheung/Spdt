@@ -1,0 +1,5 @@
+jdk:
+  - openjdk8
+install:
+  - echo "Running './gradlew clean -xtest -xlint install build publishToMavenLocal'"
+  - ./gradlew clean -xtest -xlint install build publishToMavenLocal
