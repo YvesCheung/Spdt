@@ -19,25 +19,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            res.srcDirs = ['src/main/res', 'src/main/res-pro']
+        }
+    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-
-spdt {
-
-    LaotieFlavor {
-        appid = 'yym141and'
-
-        resourceSuffix = "_lt"
-    }
-
-    XiaoMiFlavor {
-        appid = 'yym139and'
-
-        resourceSuffix = "_mi"
-    }
-
-    current = LaotieFlavor
+    api project(":library-free")
 }

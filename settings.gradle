@@ -3,7 +3,7 @@ static def isRemoteCI() {
 }
 
 if (!isRemoteCI()) { //本地才包含demo
-    include ':app', ':library'
+    include ':app', ':library-free', ':library-pro'
 }
 include ':spdt-plugin', ':spdt-api',
     ':spdt-annotation', ':spdt-compiler',

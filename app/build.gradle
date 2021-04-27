@@ -27,16 +27,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets {
-        main {
-            res.srcDirs = ['src/main/res', 'src/main/res-mi']
-        }
-    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.support:support-v4:$support_version"
 
-    api project(":library")
+    api project(":library-free")
+    api project(":library-pro")
 }

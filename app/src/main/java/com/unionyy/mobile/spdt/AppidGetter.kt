@@ -1,25 +1,25 @@
 package com.unionyy.mobile.spdt
 
-import com.unionyy.mobile.spdt.annotation.LaotieFlavor
+import com.unionyy.mobile.spdt.annotation.FreeEdition
+import com.unionyy.mobile.spdt.annotation.ProfessionalEdition
 import com.unionyy.mobile.spdt.annotation.SpdtActual
-import com.unionyy.mobile.spdt.annotation.XiaoMiFlavor
 
 interface AppidGetter {
 
     val appid: String
 }
 
-@SpdtActual(LaotieFlavor::class)
-class LaotieGetter : AppidGetter {
+@SpdtActual(ProfessionalEdition::class)
+class ProfessionalAppidGetter : AppidGetter {
 
     override val appid: String
-        get() = "laotie"
+        get() = "1001"
 }
 
-@SpdtActual(XiaoMiFlavor::class)
-class XiaomiGetter : AppidGetter {
+@SpdtActual(FreeEdition::class)
+class FreeAppidGetter : AppidGetter {
 
     override val appid: String
-        get() = "xiaomi"
+        get() = "1002"
 }
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary_pro">#f0f00f</color>
+    <color name="colorPrimaryDark_pro">#303F9F</color>
+    <color name="colorAccent_pro">#FF4081</color>
+    <color name="helloworldtext_pro">#000000</color>
+</resources>

@@ -3,13 +3,12 @@ package com.unionyy.mobile.spdt
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
+import com.unionyy.mobile.spdt.library.SomeFunction
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : Activity() {
 
-//    private val getter = Spdt.currentFlavor()
-
-    val getter: AppidGetter by spdtInject()
+    val function: SomeFunction by spdtInject()
 
     val `我是中文`: AppidGetter by spdtInject()
 
@@ -18,13 +17,6 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        textView.text = Test().test.appid + " " + 我是中文.appid
-
-        com.unionyy.mobile.spdt.diffpackage.MainActivity().test(this)
-    }
-
-    class Test {
-
-        val test: AppidGetter by spdtInject()
+        textView.text = function.call() + 我是中文.appid
     }
 }

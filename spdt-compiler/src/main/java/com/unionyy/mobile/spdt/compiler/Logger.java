@@ -19,7 +19,7 @@ public class Logger {
         if (message.length() == 0) {
             return;
         }
-        mMessager.printMessage(Kind.NOTE, format ? message(message) : message);
+        mMessager.printMessage(Kind.NOTE, format ? message(message) : "Spdt log:" + message);
     }
 
     public void error(String message) {

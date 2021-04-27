@@ -4,7 +4,7 @@ package com.unionyy.mobile.spdt.library
  * @author YvesCheung
  * 2019-12-16
  */
-interface LibTest {
+interface SomeFunction {
 
-    fun a(): String
+    fun call(): String
 }
