@@ -287,8 +287,8 @@ class ExpectProcessor : IProcessor {
     private inner class LibraryFactoryGenerator : ExpectToActualFactoryGenerator {
 
         override fun generateFactoryClass(env: Env, mapExpectToActual: Map<TypeMirror, Set<TypeElement>>) {
-            val moduleName = env.options["spdt_module_name"]?.capitalize()
-                ?: "Spdt" + UUID.randomUUID().toString().replace("-", "")
+            val moduleName = (env.options["spdt_module_name"]?.capitalize()
+                ?: "Spdt" + UUID.randomUUID().toString()).replace("-", "_")
             for ((expectCls, value) in mapExpectToActual) {
                 val factoryName = ClassName(env.packageName, "SpdtExpectToActualFactory")
                 val expectClsName = ClassName.bestGuess(expectCls.toString())

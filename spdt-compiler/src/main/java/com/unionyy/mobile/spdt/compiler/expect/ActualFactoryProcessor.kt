@@ -33,12 +33,10 @@ class ActualFactoryProcessor : IProcessor {
             if (app.size > 1) {
                 log.error("More than one @SpdtApp class found!")
             } else {
-                log.info("getPackageElement = ${ExpectProcessor.PKG_NAME}")
                 //map expect className -> factory class list
                 val map = mutableMapOf<String, MutableList<TypeElement>>()
                 val genPackage = env.elements.getPackageElement(ExpectProcessor.PKG_NAME)
                     ?: return
-                log.info("process genPackage = $genPackage")
                 for (element in ElementFilter.typesIn(genPackage.enclosedElements)) {
                     log.info("middle factory = $element")
                     val index = element.getAnnotation(SpdtIndex::class.java)
